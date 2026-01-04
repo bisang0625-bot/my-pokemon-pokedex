@@ -1,0 +1,52 @@
+/**
+ * 도감 관련 유틸리티 함수
+ */
+
+/**
+ * 분석된 카드를 도감에 저장
+ * @param {string} imageUrl - 카드 이미지 URL
+ * @param {Object} analysisResult - 분석 결과 객체
+ */
+export function saveCardToPokedex(imageUrl, analysisResult) {
+  const savedCards = JSON.parse(localStorage.getItem('pokedexCards') || '[]')
+  
+  const newCard = {
+    id: Date.now().toString(),
+    image: imageUrl,
+    name: analysisResult.name || '알 수 없는 포켓몬',
+    type: analysisResult.type || '알 수 없음',
+    hp: analysisResult.hp || 0,
+    rarity: analysisResult.rarity || 1,
+    description: analysisResult.description || '',
+    powerLevel: analysisResult.powerLevel || 50,
+    strongAgainst: analysisResult.strongAgainst || '',
+    weakAgainst: analysisResult.weakAgainst || '',
+    nickname: analysisResult.nickname || '',
+    scannedAt: new Date().toISOString()
+  }
+  
+  savedCards.push(newCard)
+  localStorage.setItem('pokedexCards', JSON.stringify(savedCards))
+  
+  return newCard
+}
+
+/**
+ * 도감에서 카드 가져오기
+ * @returns {Array} 저장된 카드 배열
+ */
+export function getCardsFromPokedex() {
+  return JSON.parse(localStorage.getItem('pokedexCards') || '[]')
+}
+
+/**
+ * 도감에서 카드 삭제
+ * @param {string} cardId - 삭제할 카드 ID
+ */
+export function deleteCardFromPokedex(cardId) {
+  const savedCards = JSON.parse(localStorage.getItem('pokedexCards') || '[]')
+  const updatedCards = savedCards.filter(card => card.id !== cardId)
+  localStorage.setItem('pokedexCards', JSON.stringify(updatedCards))
+  return updatedCards
+}
+

@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* 게이지 바 애니메이션 */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+/* 불꽃 애니메이션 (HP 200 이상) */
+@keyframes fire {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes fire-top {
+  0%, 100% {
+    opacity: 0.8;
+    transform: translateX(-100%);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(100%);
+  }
+}
+
+@keyframes fire-bottom {
+  0%, 100% {
+    opacity: 0.8;
+    transform: translateX(100%);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(-100%);
+  }
+}
+
+.animate-fire {
+  background-size: 200% 100%;
+  animation: fire 1.5s ease-in-out infinite;
+}
+
+.animate-fire-top {
+  animation: fire-top 1s linear infinite;
+}
+
+.animate-fire-bottom {
+  animation: fire-bottom 1s linear infinite;
+}
+
+
+
