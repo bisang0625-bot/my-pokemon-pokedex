@@ -1,6 +1,6 @@
 /**
  * 카드 시세 서비스
- * 최신 @google/genai SDK와 안정적인 1.5-flash-002 모델을 사용합니다.
+ * 최신 @google/genai SDK와 가장 안정적인 1.5-flash-8b 모델을 사용합니다.
  */
 
 import { GoogleGenAI } from "@google/genai";
@@ -13,8 +13,8 @@ const client = new GoogleGenAI({ apiKey: API_KEY });
  */
 export async function getRealCardPrice(card) {
   try {
-    // [통일] geminiService와 동일하게 안정적인 모델명을 사용합니다.
-    const modelName = "gemini-1.5-flash-002";
+    // [중요] geminiService와 동일하게 8b 모델로 고정하여 404 에러를 방지합니다.
+    const modelName = "gemini-1.5-flash-8b";
 
     const prompt = `
 포켓몬 카드 시세 정보를 제공해주세요.
@@ -68,54 +68,3 @@ export async function getRealCardPrice(card) {
       isRealPrice: false,
       error: error.message
     };
-  }
-}
-
-/**
- * 카드 정보를 기반으로 추정 가격 계산 (API 장애 대비용)
- */
-export function estimateCardPrice(card) {
-  const basePrices = { 1: 500, 2: 2000, 3: 5000, 4: 15000, 5: 50000 };
-  let basePrice = basePrices[card.rarity] || basePrices[1];
-  const hpMultiplier = 1 + (card.hp || 0) / 500;
-  const powerMultiplier = 1 + ((card.powerLevel || 50) / 200);
-
-  const estimatedPrice = Math.round(basePrice * hpMultiplier * powerMultiplier);
-
-  return {
-    estimated: estimatedPrice,
-    min: Math.round(estimatedPrice * 0.7),
-    max: Math.round(estimatedPrice * 1.5),
-    currency: 'KRW',
-    lastUpdated: new Date().toISOString()
-  };
-}
-
-/**
- * 모든 카드의 총 가치 계산
- */
-export function calculateTotalValue(cards) {
-  const prices = cards.map(card => estimateCardPrice(card));
-  const totalMin = prices.reduce((sum, price) => sum + price.min, 0);
-  const totalMax = prices.reduce((sum, price) => sum + price.max, 0);
-  const totalEstimated = prices.reduce((sum, price) => sum + price.estimated, 0);
-
-  return {
-    totalMin,
-    totalMax,
-    totalEstimated,
-    cardCount: cards.length,
-    averagePrice: Math.round(totalEstimated / cards.length) || 0
-  };
-}
-
-/**
- * 가격 포맷팅
- */
-export function formatPrice(price) {
-  return new Intl.NumberFormat('ko-KR', {
-    style: 'currency',
-    currency: 'KRW',
-    maximumFractionDigits: 0
-  }).format(price);
-}
