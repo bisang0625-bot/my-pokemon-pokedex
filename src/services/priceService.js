@@ -1,23 +1,21 @@
 /**
  * 카드 시세 서비스
- * Gemini API를 사용하여 실제 시세를 조회합니다
+ * 최신 @google/genai SDK를 사용하여 실제 시세를 조회합니다.
  */
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyApZ7YcaEIwIaFudBzdZ1g22e4JmunohqY";
-const genAI = new GoogleGenerativeAI(API_KEY);
+// [보안] Vercel 환경변수에서 키를 가져오며, 없을 경우에만 임시 키를 사용합니다.
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const client = new GoogleGenAI({ apiKey: API_KEY });
 
 /**
  * Gemini API를 사용하여 실제 카드 시세 조회
- * @param {Object} card - 카드 정보 객체
- * @returns {Promise<Object>} 가격 정보
  */
 export async function getRealCardPrice(card) {
   try {
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-flash" 
-    });
+    // [최신화] 할당량이 적은 2.5 대신 안정적인 2.0 Flash 모델을 사용합니다.
+    const modelName = "gemini-2.0-flash";
 
     const prompt = `
 포켓몬 카드 시세 정보를 제공해주세요.
@@ -26,32 +24,30 @@ export async function getRealCardPrice(card) {
 - 이름: ${card.name}
 - HP: ${card.hp}
 - 타입: ${card.type}
-- 희귀도: ${card.rarity}성 (${Array(card.rarity || 0).fill('⭐').join('')})
+- 희귀도: ${card.rarity}성
 - 종합 능력: ${card.powerLevel || 50}점
 
-다음 JSON 형식으로만 답해주세요:
+다음 JSON 형식으로만 답해주세요 (다른 설명 금지):
 {
-  "estimated": 숫자 (한국 원화 기준 추정 가격),
-  "min": 숫자 (최소 가격),
-  "max": 숫자 (최대 가격),
-  "source": "시세 출처 (예: 온라인 마켓플레이스, 중고 거래 사이트 등)",
-  "note": "가격에 대한 간단한 설명 (선택사항)"
+  "estimated": 숫자,
+  "min": 숫자,
+  "max": 숫자,
+  "source": "시세 출처",
+  "note": "설명"
 }
 
-주의사항:
-- 실제 시장 가격을 기반으로 추정해주세요
-- 한국 원화(KRW) 기준으로 답해주세요
-- 카드 상태가 양호하다고 가정하고 가격을 책정해주세요
-- 희귀도, HP, 타입 등을 종합적으로 고려해주세요
-- JSON 형식만 반환하고 다른 설명은 포함하지 마세요
+주의: 한국 원화(KRW) 기준으로 작성하세요.
 `;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    // [최신화] 신규 SDK 문법으로 변경
+    const response = await client.models.generateContent({
+      model: modelName,
+      contents: [{ role: 'user', parts: [{ text: prompt }] }]
+    });
 
-    // JSON 추출
+    const text = response.response.text();
     const jsonMatch = text.match(/\{[\s\S]*\}/);
+    
     if (!jsonMatch) {
       throw new Error("시세 정보를 읽을 수 없습니다.");
     }
@@ -70,7 +66,6 @@ export async function getRealCardPrice(card) {
     };
   } catch (error) {
     console.error("시세 조회 오류:", error);
-    // 오류 발생 시 추정 가격 반환
     return {
       ...estimateCardPrice(card),
       isRealPrice: false,
@@ -80,66 +75,35 @@ export async function getRealCardPrice(card) {
 }
 
 /**
- * 카드 정보를 기반으로 추정 가격 계산
- * @param {Object} card - 카드 정보 객체
- * @returns {Object} 가격 정보
+ * 카드 정보를 기반으로 추정 가격 계산 (API 장애 대비용)
  */
 export function estimateCardPrice(card) {
-  // 기본 가격 (희귀도별)
-  const basePrices = {
-    1: 500,   // 일반 카드
-    2: 2000,  // 희귀 카드
-    3: 5000,  // 매우 희귀
-    4: 15000, // 초희귀
-    5: 50000  // 전설
-  }
+  const basePrices = { 1: 500, 2: 2000, 3: 5000, 4: 15000, 5: 50000 };
+  let basePrice = basePrices[card.rarity] || basePrices[1];
+  const hpMultiplier = 1 + (card.hp || 0) / 500;
+  const powerMultiplier = 1 + ((card.powerLevel || 50) / 200);
+  const typeMultipliers = { fire: 1.2, water: 1.1, grass: 1.0, electric: 1.3 };
+  const typeMultiplier = typeMultipliers[card.type] || 1.0;
 
-  let basePrice = basePrices[card.rarity] || basePrices[1]
-
-  // HP 보정 (HP가 높을수록 가격 상승)
-  const hpMultiplier = 1 + (card.hp || 0) / 500
-
-  // 종합 능력 보정
-  const powerMultiplier = 1 + ((card.powerLevel || 50) / 200)
-
-  // 타입 보정 (일부 타입은 인기)
-  const typeMultipliers = {
-    fire: 1.2,
-    water: 1.1,
-    grass: 1.0,
-    electric: 1.3
-  }
-  const typeMultiplier = typeMultipliers[card.type] || 1.0
-
-  // 최종 가격 계산
-  const estimatedPrice = Math.round(
-    basePrice * hpMultiplier * powerMultiplier * typeMultiplier
-  )
-
-  // 가격 범위 설정 (시장 변동성 고려)
-  const minPrice = Math.round(estimatedPrice * 0.7)
-  const maxPrice = Math.round(estimatedPrice * 1.5)
+  const estimatedPrice = Math.round(basePrice * hpMultiplier * powerMultiplier * typeMultiplier);
 
   return {
     estimated: estimatedPrice,
-    min: minPrice,
-    max: maxPrice,
+    min: Math.round(estimatedPrice * 0.7),
+    max: Math.round(estimatedPrice * 1.5),
     currency: 'KRW',
     lastUpdated: new Date().toISOString()
-  }
+  };
 }
 
 /**
  * 모든 카드의 총 가치 계산
- * @param {Array} cards - 카드 배열
- * @returns {Object} 총 가치 정보
  */
 export function calculateTotalValue(cards) {
-  const prices = cards.map(card => estimateCardPrice(card))
-  
-  const totalMin = prices.reduce((sum, price) => sum + price.min, 0)
-  const totalMax = prices.reduce((sum, price) => sum + price.max, 0)
-  const totalEstimated = prices.reduce((sum, price) => sum + price.estimated, 0)
+  const prices = cards.map(card => estimateCardPrice(card));
+  const totalMin = prices.reduce((sum, price) => sum + price.min, 0);
+  const totalMax = prices.reduce((sum, price) => sum + price.max, 0);
+  const totalEstimated = prices.reduce((sum, price) => sum + price.estimated, 0);
 
   return {
     totalMin,
@@ -147,19 +111,16 @@ export function calculateTotalValue(cards) {
     totalEstimated,
     cardCount: cards.length,
     averagePrice: Math.round(totalEstimated / cards.length) || 0
-  }
+  };
 }
 
 /**
- * 가격을 포맷팅하여 표시
- * @param {number} price - 가격
- * @returns {string} 포맷팅된 가격 문자열
+ * 가격 포맷팅
  */
 export function formatPrice(price) {
   return new Intl.NumberFormat('ko-KR', {
     style: 'currency',
     currency: 'KRW',
     maximumFractionDigits: 0
-  }).format(price)
+  }).format(price);
 }
-
