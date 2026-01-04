@@ -2,23 +2,22 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 /**
  * [보안 업데이트] 
- * 실제 키(AIza...) 대신 시스템 이름표(환경 변수)를 사용합니다.
- * 실제 키값은 프로젝트 최상위 폴더의 .env 파일에 보관하세요.
+ * 실제 키 대신 시스템 이름표(환경 변수)를 사용합니다.
+ * Vercel Settings -> Environment Variables에 VITE_GEMINI_API_KEY가 등록되어 있어야 합니다.
  */
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY; 
-
-// API 키가 없을 경우를 대비한 안전 장치
-if (!API_KEY) {
-  console.warn("경고: .env 파일에 VITE_GEMINI_API_KEY가 설정되지 않았습니다.");
-}
 
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 export async function analyzeCard(imageBlob) {
   try {
-    // 2026년 표준인 2.5 Flash 모델 사용
+    /**
+     * [모델 변경] 
+     * gemini-2.5-flash는 무료 할당량이 하루 20회로 매우 적습니다.
+     * gemini-1.5-flash는 하루 1,500회까지 무료로 사용 가능하여 아이와 놀기에 최적입니다.
+     */
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-flash" 
+      model: "gemini-1.5-flash" 
     });
 
     const imagePart = await fileToGenerativePart(imageBlob);
@@ -49,7 +48,7 @@ export async function analyzeCard(imageBlob) {
     
     const resultData = JSON.parse(jsonMatch[0]);
     
-    // 데이터 검증 및 정규화 (아이들이 보기 편하도록 데이터 정리)
+    // 데이터 검증 및 정규화
     const normalizedResult = {
       name: resultData.name || '알 수 없는 포켓몬',
       hp: typeof resultData.hp === 'number' ? resultData.hp : parseInt(resultData.hp) || 0,
@@ -69,8 +68,9 @@ export async function analyzeCard(imageBlob) {
   } catch (error) {
     console.error("Gemini 에러 상세:", error);
     
-    if (error.message.includes('404')) {
-        throw new Error("라이브러리 업데이트가 필요합니다. 터미널에 'npm install @google/generative-ai@latest'를 입력해주세요.");
+    // 할당량 초과(429) 에러 시 사용자 친화적인 메시지 출력
+    if (error.message.includes('429')) {
+        throw new Error("오늘 사용할 수 있는 분석 횟수가 끝났습니다. 내일 다시 시도해주세요!");
     }
     
     throw new Error("카드 분석 중 오류: " + error.message);
