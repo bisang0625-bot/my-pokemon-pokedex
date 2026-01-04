@@ -68,3 +68,57 @@ export async function getRealCardPrice(card) {
       isRealPrice: false,
       error: error.message
     };
+  }
+}
+
+/**
+ * 카드 정보를 기반으로 추정 가격 계산 (API 장애 대비용)
+ */
+export function estimateCardPrice(card) {
+  const basePrices = { 1: 500, 2: 2000, 3: 5000, 4: 15000, 5: 50000 };
+  let basePrice = basePrices[card.rarity] || basePrices[1];
+  const hpMultiplier = 1 + (card.hp || 0) / 500;
+  const powerMultiplier = 1 + ((card.powerLevel || 50) / 200);
+
+  const estimatedPrice = Math.round(basePrice * hpMultiplier * powerMultiplier);
+
+  return {
+    estimated: estimatedPrice,
+    min: Math.round(estimatedPrice * 0.7),
+    max: Math.round(estimatedPrice * 1.5),
+    currency: 'KRW',
+    lastUpdated: new Date().toISOString()
+  };
+}
+
+/**
+ * 모든 카드의 총 가치 계산
+ */
+export function calculateTotalValue(cards) {
+  if (!cards || cards.length === 0) {
+    return { totalMin: 0, totalMax: 0, totalEstimated: 0, cardCount: 0, averagePrice: 0 };
+  }
+  const prices = cards.map(card => estimateCardPrice(card));
+  const totalMin = prices.reduce((sum, price) => sum + price.min, 0);
+  const totalMax = prices.reduce((sum, price) => sum + price.max, 0);
+  const totalEstimated = prices.reduce((sum, price) => sum + price.estimated, 0);
+
+  return {
+    totalMin,
+    totalMax,
+    totalEstimated,
+    cardCount: cards.length,
+    averagePrice: Math.round(totalEstimated / cards.length) || 0
+  };
+}
+
+/**
+ * 가격 포맷팅
+ */
+export function formatPrice(price) {
+  return new Intl.NumberFormat('ko-KR', {
+    style: 'currency',
+    currency: 'KRW',
+    maximumFractionDigits: 0
+  }).format(price);
+}
