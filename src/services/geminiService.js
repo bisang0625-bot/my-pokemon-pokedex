@@ -1,38 +1,36 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const client = new GoogleGenAI({ apiKey: API_KEY });
+const genAI = new GoogleGenerativeAI(API_KEY);
 
 export async function analyzeCard(imageBlob) {
   try {
-    // 404 에러를 피하기 위해 아까 작동했던 2.0 모델로 이름을 완전히 바꿉니다.
-    const modelName = "gemini-2.0-flash"; 
-    
+    // gemini-1.5-pro는 텍스트와 이미지를 모두 처리할 수 있는 모델입니다.
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+
     const base64Data = await blobToBase64(imageBlob);
 
     const prompt = `이 포켓몬 카드를 분석해서 아래 JSON으로만 답해줘. { "name": "이름", "hp": 숫자, "type": "fire/water/grass/electric", "rarity": 1~5, "description": "설명", "powerLevel": 1~100, "strongAgainst": "강점", "weakAgainst": "약점", "nickname": "별명" }`;
 
-    const response = await client.models.generateContent({
-      model: modelName,
-      contents: [{
-        role: 'user',
-        parts: [
-          { text: prompt },
-          { inlineData: { data: base64Data, mimeType: imageBlob.type } }
-        ]
-      }]
-    });
+    const imagePart = {
+      inlineData: {
+        data: base64Data,
+        mimeType: imageBlob.type,
+      },
+    };
 
-    const text = response.text ? response.text() : response.response.text();
+    const result = await model.generateContent([prompt, imagePart]);
+
+    const response = await result.response;
+    const text = response.text();
     const jsonMatch = text.match(/\{[\s\S]*\}/);
-    
+
     if (!jsonMatch) throw new Error("분석 데이터를 찾을 수 없습니다.");
     return JSON.parse(jsonMatch[0]);
 
   } catch (error) {
     console.error("분석 에러 발생:", error);
-    // 에러 메시지에 모델 이름을 포함시켜서 실제로 어떤 모델이 호출되는지 확인합니다.
-    alert(`[모델: gemini-2.0-flash] 오류 발생: ${error.message}`);
+    alert(`카드 분석 오류: ${error.message}`);
     throw error;
   }
 }

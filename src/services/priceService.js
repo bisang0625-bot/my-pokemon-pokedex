@@ -1,23 +1,20 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const client = new GoogleGenAI({ apiKey: API_KEY });
+const genAI = new GoogleGenerativeAI(API_KEY);
 
 export async function getRealCardPrice(card) {
   try {
-    const modelName = "gemini-2.0-flash";
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
     const prompt = `포켓몬 카드 시세 정보를 제공해주세요. 카드 정보: 이름 ${card.name}, HP ${card.hp}, 타입 ${card.type}, 희귀도 ${card.rarity}성. 다음 JSON으로만 답해줘: { "estimated": 숫자, "min": 숫자, "max": 숫자, "source": "출처", "note": "메모" } 반드시 한국 원화(KRW) 기준으로 작성하세요.`;
 
-    const response = await client.models.generateContent({
-      model: modelName,
-      contents: [{ role: 'user', parts: [{ text: prompt }] }]
-    });
-
-    const text = response.text ? response.text() : response.response.text();
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error("시세 정보를 읽을 수 없습니다.");
-    
+
     const priceData = JSON.parse(jsonMatch[0]);
 
     return {
