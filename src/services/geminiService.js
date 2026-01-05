@@ -5,8 +5,8 @@ const genAI = new GoogleGenerativeAI(API_KEY);
 
 export async function analyzeCard(imageBlob) {
   try {
-    // gemini-1.5-flash-002는 무료 티어에서 더 높은 할당량을 제공합니다 (하루 1500개 요청).
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-002" });
+    // gemini-2.5-flash-lite 모델을 사용합니다.
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
     const base64Data = await blobToBase64(imageBlob);
 
