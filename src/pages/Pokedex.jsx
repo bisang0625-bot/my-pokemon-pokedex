@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getCardsFromPokedex, deleteCardFromPokedex } from '../utils/pokedexUtils'
+import { estimateCardPrice, formatPrice } from '../services/priceService'
 
 export default function Pokedex() {
   const [cards, setCards] = useState([])
@@ -13,8 +14,8 @@ export default function Pokedex() {
   }, [])
 
   // 타입 필터링
-  const typeFilteredCards = selectedType === 'all' 
-    ? cards 
+  const typeFilteredCards = selectedType === 'all'
+    ? cards
     : cards.filter(card => card.type === selectedType)
 
   // 검색 필터링
@@ -85,7 +86,7 @@ export default function Pokedex() {
       backgroundRepeat: 'no-repeat'
     }}>
       <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-6 m-4 border-2 border-yellow-200">
-        <h2 className="text-4xl font-black mb-6 text-center text-gray-800 drop-shadow-lg">
+        <h2 className="text-3xl sm:text-4xl font-black mb-6 text-center text-gray-800 drop-shadow-lg">
           📚 내 포켓몬 도감
         </h2>
 
@@ -94,13 +95,13 @@ export default function Pokedex() {
           {/* 수집 진행률 게이지 바 */}
           <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 border-2 border-blue-200 shadow-lg">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-lg font-bold text-gray-800">수집 진행률</span>
-              <span className="text-2xl font-black text-blue-600">
+              <span className="text-base sm:text-lg font-bold text-gray-800">수집 진행률</span>
+              <span className="text-xl sm:text-2xl font-black text-blue-600">
                 {totalCards} / {targetCards}장
               </span>
             </div>
             <div className="relative bg-gray-200 rounded-full h-8 overflow-hidden shadow-inner border-2 border-gray-300">
-              <div 
+              <div
                 className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 h-full rounded-full transition-all duration-1000 ease-out relative overflow-hidden"
                 style={{ width: `${collectionProgress}%` }}
               >
@@ -115,13 +116,13 @@ export default function Pokedex() {
           {/* 알 부화 에너지 */}
           <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-4 border-2 border-yellow-300 shadow-lg">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-lg font-bold text-gray-800">🥚 알 부화 에너지</span>
-              <span className="text-xl font-black text-orange-600">
+              <span className="text-base sm:text-lg font-bold text-gray-800">🥚 알 부화 에너지</span>
+              <span className="text-lg sm:text-xl font-black text-orange-600">
                 {Math.round(eggEnergy)}%
               </span>
             </div>
             <div className="relative bg-gray-200 rounded-full h-12 overflow-hidden shadow-inner border-2 border-gray-300">
-              <div 
+              <div
                 className="bg-gradient-to-r from-yellow-300 via-orange-400 to-red-500 h-full rounded-full transition-all duration-1000 ease-out relative overflow-hidden"
                 style={{ width: `${eggEnergy}%` }}
               >
@@ -160,11 +161,10 @@ export default function Pokedex() {
               <button
                 key={type}
                 onClick={() => setSelectedType(type)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-all transform hover:scale-105 shadow-md ${
-                  selectedType === type
-                    ? 'bg-gradient-to-r from-yellow-400 to-orange-400 text-white border-2 border-yellow-600 scale-105'
-                    : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-yellow-400'
-                }`}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-all transform hover:scale-105 shadow-md ${selectedType === type
+                  ? 'bg-gradient-to-r from-yellow-400 to-orange-400 text-white border-2 border-yellow-600 scale-105'
+                  : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-yellow-400'
+                  }`}
               >
                 <span className="text-xl">{getTypeIcon(type)}</span>
                 <span>{getTypeLabel(type)}</span>
@@ -193,9 +193,9 @@ export default function Pokedex() {
         {sortedCards.length === 0 ? (
           <div className="text-center py-16 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border-2 border-gray-200">
             <div className="text-6xl mb-4">😢</div>
-            <p className="text-gray-600 text-xl font-semibold">
-              {searchTerm || selectedType !== 'all' 
-                ? '검색 결과가 없습니다.' 
+            <p className="text-gray-600 text-base sm:text-xl font-semibold break-words px-4">
+              {searchTerm || selectedType !== 'all'
+                ? '검색 결과가 없습니다.'
                 : '아직 수집한 카드가 없습니다. 카메라로 스캔해보세요!'}
             </p>
           </div>
@@ -215,7 +215,7 @@ export default function Pokedex() {
                     />
                   </div>
                 )}
-                <h3 className="text-2xl font-black mb-1 text-gray-800">
+                <h3 className="text-xl sm:text-2xl font-black mb-1 text-gray-800 break-words">
                   {card.name || '알 수 없는 포켓몬'}
                 </h3>
                 {card.nickname && (
@@ -223,6 +223,12 @@ export default function Pokedex() {
                     ✨ {card.nickname}
                   </p>
                 )}
+                {/* 카드 가치 표시 */}
+                <div className="mb-3">
+                  <span className="inline-block bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-md">
+                    💰 {formatPrice(estimateCardPrice(card).estimated)}
+                  </span>
+                </div>
                 <div className="space-y-2 text-sm text-gray-700 mb-4">
                   {card.type && (
                     <div className="flex items-center gap-2">
@@ -247,7 +253,7 @@ export default function Pokedex() {
                     <div>
                       <span><strong>종합 능력:</strong></span>
                       <div className="mt-1 bg-gray-200 rounded-full h-4 relative overflow-hidden shadow-inner">
-                        <div 
+                        <div
                           className="bg-gradient-to-r from-blue-500 to-purple-500 h-full rounded-full"
                           style={{ width: `${card.powerLevel}%` }}
                         />

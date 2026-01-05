@@ -42,13 +42,13 @@ export default function ParentMode() {
           }
         })
       )
-      
+
       setCardPrices(pricesWithRealData)
-      
+
       const totalMin = pricesWithRealData.reduce((sum, card) => sum + (card.price.min || 0), 0)
       const totalMax = pricesWithRealData.reduce((sum, card) => sum + (card.price.max || 0), 0)
       const totalEstimated = pricesWithRealData.reduce((sum, card) => sum + (card.price.estimated || 0), 0)
-      
+
       setTotalValue({
         totalMin,
         totalMax,
@@ -80,7 +80,7 @@ export default function ParentMode() {
     <div className="max-w-4xl mx-auto">
       <div className="bg-white rounded-lg shadow-lg p-8">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">👨‍👩‍👧 부모 관리 모드</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800">👨‍👩‍👧 부모 관리 모드</h2>
           <span className="text-sm text-green-600 font-semibold bg-green-50 px-3 py-1 rounded-full border border-green-200">
             보안 연결됨 (ENV)
           </span>
@@ -93,7 +93,7 @@ export default function ParentMode() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-600">총 수집 카드</p>
-                <p className="text-2xl font-bold text-blue-600">{stats.totalCards}장</p>
+                <p className="text-xl sm:text-2xl font-bold text-blue-600">{stats.totalCards}장</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600">마지막 스캔</p>
@@ -109,7 +109,7 @@ export default function ParentMode() {
             <h3 className="text-xl font-bold mb-4 text-gray-800 flex items-center gap-2">
               💰 카드 가치 분석
             </h3>
-            
+
             {isLoadingPrices ? (
               <div className="text-center py-4">
                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mb-2"></div>
@@ -119,10 +119,39 @@ export default function ParentMode() {
               <div className="space-y-4">
                 <div className="bg-white rounded-lg p-4 border-2 border-green-400 shadow-md">
                   <p className="text-sm text-gray-600 mb-1">총 예상 가치</p>
-                  <p className="text-3xl font-black text-green-600">{formatPrice(totalValue.totalEstimated)}</p>
+                  <p className="text-2xl sm:text-3xl font-black text-green-600 break-words">{formatPrice(totalValue.totalEstimated)}</p>
                   <p className="text-xs text-gray-400 mt-2">평균 카드 가격: {formatPrice(totalValue.averagePrice)}</p>
                 </div>
-                {/* 개별 리스트는 생략 가능하거나 필요시 유지 */}
+
+                {/* 개별 카드 가치 목록 */}
+                {cardPrices.length > 0 && (
+                  <details className="bg-white rounded-lg p-4 border border-green-300">
+                    <summary className="cursor-pointer font-semibold text-gray-700 hover:text-green-600 transition-colors">
+                      📋 카드별 가치 상세보기 ({cardPrices.length}장)
+                    </summary>
+                    <div className="mt-4 space-y-2 max-h-96 overflow-y-auto">
+                      {[...cardPrices].sort((a, b) => (b.price?.estimated || 0) - (a.price?.estimated || 0)).map((card) => (
+                        <div key={card.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200">
+                          {card.image && (
+                            <img src={card.image} alt={card.name} className="w-12 h-12 flex-shrink-0 rounded object-cover border border-gray-300" />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-gray-800 truncate">{card.name || '알 수 없음'}</p>
+                            <p className="text-xs text-gray-500">
+                              {card.price?.isRealPrice ? '🤖 AI 시세' : '📊 추정가'}
+                            </p>
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            <p className="font-bold text-green-600 whitespace-nowrap">{formatPrice(card.price?.estimated || 0)}</p>
+                            <p className="text-xs text-gray-500 whitespace-nowrap">
+                              {formatPrice(card.price?.min || 0)} ~ {formatPrice(card.price?.max || 0)}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </details>
+                )}
               </div>
             ) : (
               <p className="text-center text-gray-500 py-4">수집한 카드가 없습니다.</p>

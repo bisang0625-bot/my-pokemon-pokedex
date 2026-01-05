@@ -31,7 +31,7 @@ export default function CameraScan() {
     setCameraError(null)
     setAnalysisResult(null)
     setCapturedImage(null)
-    
+
     // 카메라 권한 확인 및 요청
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true })
@@ -61,14 +61,14 @@ export default function CameraScan() {
       setError(null)
       setAnalysisResult(null)
       setIsAnalyzing(true)
-      
+
       // base64 이미지를 Blob으로 변환
       const response = await fetch(capturedImage)
       const blob = await response.blob()
-      
+
       const result = await analyzeCard(blob)
       setAnalysisResult(result)
-      
+
       // 도감에 자동 저장
       saveCardToPokedex(capturedImage, result)
     } catch (err) {
@@ -134,7 +134,7 @@ export default function CameraScan() {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+        <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center text-gray-800">
           📷 카드 스캔
         </h2>
 
@@ -193,9 +193,9 @@ export default function CameraScan() {
                         onUserMediaError={(error) => {
                           console.error('카메라 접근 오류:', error)
                           const errorMessage = error.message || error.name || '알 수 없는 오류'
-                          
+
                           let userMessage = '카메라에 접근할 수 없습니다.\n\n'
-                          
+
                           if (errorMessage.includes('Permission denied') || errorMessage.includes('NotAllowedError')) {
                             userMessage += '브라우저 주소창의 자물쇠 아이콘(🔒)을 클릭하여 카메라 권한을 허용해주세요.\n또는 브라우저 설정에서 이 사이트의 카메라 권한을 확인해주세요.'
                           } else if (errorMessage.includes('NotFoundError') || errorMessage.includes('DevicesNotFoundError')) {
@@ -203,7 +203,7 @@ export default function CameraScan() {
                           } else {
                             userMessage += `오류: ${errorMessage}\n카메라 권한을 확인해주세요.`
                           }
-                          
+
                           setCameraError(userMessage)
                         }}
                         className="w-full h-auto"
@@ -270,10 +270,10 @@ export default function CameraScan() {
 
             {analysisResult && (
               <div className={`mt-6 p-6 bg-gradient-to-br ${getRarityGradient(analysisResult.rarity || 1)} rounded-2xl border-4 border-yellow-300 shadow-2xl transform transition-all duration-300 hover:scale-[1.02]`}>
-                <h3 className="text-3xl font-bold mb-6 text-center text-gray-800 drop-shadow-lg">
+                <h3 className="text-2xl sm:text-3xl font-bold mb-6 text-center text-gray-800 drop-shadow-lg break-words">
                   ✨ 분석 결과 ✨
                 </h3>
-                
+
                 <div className="space-y-5">
                   {/* 별명 - 카드 이름 위에 크게 배치 */}
                   {analysisResult.nickname && (
@@ -288,11 +288,11 @@ export default function CameraScan() {
 
                   {/* 포켓몬 이름 */}
                   <div className="text-center">
-                    <h4 className="text-4xl font-black text-gray-900 mb-3 drop-shadow-lg">
+                    <h4 className="text-3xl sm:text-4xl font-black text-gray-900 mb-3 drop-shadow-lg break-words">
                       {analysisResult.name}
                     </h4>
                   </div>
-                  
+
                   {/* 타입 */}
                   <div className="text-center">
                     <div className={`inline-block px-6 py-3 rounded-full border-3 font-bold text-lg shadow-lg ${getTypeColor(analysisResult.type)}`}>
@@ -309,7 +309,7 @@ export default function CameraScan() {
                         {analysisResult.hp || 0}
                       </div>
                     </div>
-                    
+
                     {/* 게임 스타일 에너지 바 */}
                     <div className="relative bg-gray-800 rounded-lg h-12 overflow-hidden shadow-2xl border-4 border-gray-600">
                       {/* 배경 그리드 패턴 */}
@@ -317,19 +317,18 @@ export default function CameraScan() {
                         backgroundImage: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)',
                         backgroundSize: '20px 100%'
                       }}></div>
-                      
+
                       {/* 에너지 충전 바 */}
-                      <div 
-                        className={`h-full transition-all duration-1000 ease-out relative overflow-hidden ${
-                          (analysisResult.hp || 0) >= 200 
-                            ? 'bg-gradient-to-r from-yellow-400 via-orange-500 via-red-500 to-yellow-400 animate-fire' 
+                      <div
+                        className={`h-full transition-all duration-1000 ease-out relative overflow-hidden ${(analysisResult.hp || 0) >= 200
+                            ? 'bg-gradient-to-r from-yellow-400 via-orange-500 via-red-500 to-yellow-400 animate-fire'
                             : 'bg-gradient-to-r from-red-500 via-red-600 to-red-700'
-                        }`}
+                          }`}
                         style={{ width: `${Math.min((analysisResult.hp || 0) / 200 * 100, 100)}%` }}
                       >
                         {/* 에너지 파동 효과 */}
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer"></div>
-                        
+
                         {/* HP 200 이상일 때 불꽃 효과 */}
                         {(analysisResult.hp || 0) >= 200 && (
                           <>
@@ -338,7 +337,7 @@ export default function CameraScan() {
                             <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-r from-transparent via-orange-400 to-transparent animate-fire-bottom"></div>
                           </>
                         )}
-                        
+
                         {/* 에너지 숫자 표시 */}
                         <div className="absolute inset-0 flex items-center justify-center">
                           <span className="text-lg font-black text-white drop-shadow-lg">
@@ -346,7 +345,7 @@ export default function CameraScan() {
                           </span>
                         </div>
                       </div>
-                      
+
                       {/* 에너지 충전 표시 */}
                       {(analysisResult.hp || 0) >= 200 && (
                         <div className="absolute top-1 right-2 text-yellow-300 text-xs font-black animate-bounce">
@@ -354,25 +353,24 @@ export default function CameraScan() {
                         </div>
                       )}
                     </div>
-                    
+
                     {/* 에너지 상태 텍스트 */}
                     <div className="text-center">
-                      <p className={`text-sm font-bold ${
-                        (analysisResult.hp || 0) >= 200 
-                          ? 'text-yellow-600 animate-pulse' 
+                      <p className={`text-sm font-bold ${(analysisResult.hp || 0) >= 200
+                          ? 'text-yellow-600 animate-pulse'
                           : (analysisResult.hp || 0) >= 150
-                          ? 'text-orange-600'
-                          : (analysisResult.hp || 0) >= 100
-                          ? 'text-red-600'
-                          : 'text-gray-600'
-                      }`}>
-                        {(analysisResult.hp || 0) >= 200 
-                          ? '🔥 최대 에너지 충전! 🔥' 
+                            ? 'text-orange-600'
+                            : (analysisResult.hp || 0) >= 100
+                              ? 'text-red-600'
+                              : 'text-gray-600'
+                        }`}>
+                        {(analysisResult.hp || 0) >= 200
+                          ? '🔥 최대 에너지 충전! 🔥'
                           : (analysisResult.hp || 0) >= 150
-                          ? '⚡ 에너지 높음!'
-                          : (analysisResult.hp || 0) >= 100
-                          ? '💪 에너지 보통'
-                          : '🔋 에너지 충전 필요'}
+                            ? '⚡ 에너지 높음!'
+                            : (analysisResult.hp || 0) >= 100
+                              ? '💪 에너지 보통'
+                              : '🔋 에너지 충전 필요'}
                       </p>
                     </div>
                   </div>
@@ -393,7 +391,7 @@ export default function CameraScan() {
                         <span className="font-bold text-xl text-purple-600">{analysisResult.powerLevel}점</span>
                       </div>
                       <div className="relative bg-gray-200 rounded-full h-10 overflow-hidden shadow-inner border-2 border-gray-300">
-                        <div 
+                        <div
                           className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 h-full rounded-full transition-all duration-1000 ease-out relative overflow-hidden"
                           style={{ width: `${analysisResult.powerLevel}%` }}
                         >
@@ -441,7 +439,7 @@ export default function CameraScan() {
                   {/* 설명 */}
                   {analysisResult.description && (
                     <div className="mt-6 p-5 bg-white/80 rounded-xl border-3 border-blue-300 shadow-lg">
-                      <p className="text-gray-800 text-lg font-semibold text-center leading-relaxed">
+                      <p className="text-gray-800 text-base sm:text-lg font-semibold text-center leading-relaxed break-words">
                         {analysisResult.description}
                       </p>
                     </div>

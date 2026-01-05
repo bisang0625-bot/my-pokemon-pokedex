@@ -10,7 +10,12 @@ export async function analyzeCard(imageBlob) {
 
     const base64Data = await blobToBase64(imageBlob);
 
-    const prompt = `이 포켓몬 카드를 분석해서 아래 JSON으로만 답해줘. { "name": "이름", "hp": 숫자, "type": "fire/water/grass/electric", "rarity": 1~5, "description": "설명", "powerLevel": 1~100, "strongAgainst": "강점", "weakAgainst": "약점", "nickname": "별명" }`;
+    const prompt = `이 포켓몬 카드를 분석해서 아래 JSON 형식으로만 답해줘. 
+중요: 모든 값(value)을 반드시 한국어로 작성하고, 영어를 절대 사용하지 마세요.
+타입은 "불꽃", "물", "풀", "전기" 중 하나로 한국어로 답하세요.
+강점/약점도 한국어 타입 이름으로 작성하세요 (예: "불꽃", "물" 등).
+
+{ "name": "포켓몬 이름 (한국어)", "hp": 숫자, "type": "불꽃 또는 물 또는 풀 또는 전기", "rarity": 1~5 사이 숫자, "description": "한국어 설명", "powerLevel": 1~100 사이 숫자, "strongAgainst": "한국어 타입 이름", "weakAgainst": "한국어 타입 이름", "nickname": "한국어 별명" }`;
 
     const imagePart = {
       inlineData: {

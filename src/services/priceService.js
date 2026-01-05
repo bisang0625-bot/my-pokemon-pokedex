@@ -7,7 +7,11 @@ export async function getRealCardPrice(card) {
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-    const prompt = `포켓몬 카드 시세 정보를 제공해주세요. 카드 정보: 이름 ${card.name}, HP ${card.hp}, 타입 ${card.type}, 희귀도 ${card.rarity}성. 다음 JSON으로만 답해줘: { "estimated": 숫자, "min": 숫자, "max": 숫자, "source": "출처", "note": "메모" } 반드시 한국 원화(KRW) 기준으로 작성하세요.`;
+    const prompt = `포켓몬 카드 시세 정보를 제공해주세요. 
+카드 정보: 이름 ${card.name}, HP ${card.hp}, 타입 ${card.type}, 희귀도 ${card.rarity}성. 
+중요: 모든 텍스트를 반드시 한국어로만 작성하세요. 영어를 사용하지 마세요.
+다음 JSON으로만 답해줘: { "estimated": 숫자, "min": 숫자, "max": 숫자, "source": "한국어 출처", "note": "한국어 메모" }
+반드시 한국 원화(KRW) 기준으로 작성하세요.`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
