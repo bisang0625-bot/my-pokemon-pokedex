@@ -5,8 +5,8 @@ const genAI = new GoogleGenerativeAI(API_KEY);
 
 export async function analyzeCard(imageBlob) {
   try {
-    // gemini-2.5-flash는 2026년 현재 가장 안정적인 모델입니다.
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    // gemini-1.5-flash는 무료 티어에서 더 높은 할당량을 제공합니다 (하루 1500개 요청).
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const base64Data = await blobToBase64(imageBlob);
 
