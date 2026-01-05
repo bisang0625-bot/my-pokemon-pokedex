@@ -5,7 +5,7 @@ const genAI = new GoogleGenerativeAI(API_KEY);
 
 export async function getRealCardPrice(card) {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = `포켓몬 카드 시세 정보를 제공해주세요. 카드 정보: 이름 ${card.name}, HP ${card.hp}, 타입 ${card.type}, 희귀도 ${card.rarity}성. 다음 JSON으로만 답해줘: { "estimated": 숫자, "min": 숫자, "max": 숫자, "source": "출처", "note": "메모" } 반드시 한국 원화(KRW) 기준으로 작성하세요.`;
 

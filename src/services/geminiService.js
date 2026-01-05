@@ -5,8 +5,8 @@ const genAI = new GoogleGenerativeAI(API_KEY);
 
 export async function analyzeCard(imageBlob) {
   try {
-    // gemini-1.5-pro는 텍스트와 이미지를 모두 처리할 수 있는 모델입니다.
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    // gemini-2.5-flash는 2026년 현재 가장 안정적인 모델입니다.
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const base64Data = await blobToBase64(imageBlob);
 
