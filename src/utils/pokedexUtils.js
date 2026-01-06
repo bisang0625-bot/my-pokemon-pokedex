@@ -87,7 +87,17 @@ export function saveCardToPokedex(imageUrl, analysisResult) {
  * @returns {Array} 저장된 카드 배열
  */
 export function getCardsFromPokedex() {
-  return JSON.parse(localStorage.getItem('pokedexCards') || '[]')
+  try {
+    const cardsJson = localStorage.getItem('pokedexCards')
+    if (!cardsJson) return []
+    
+    const cards = JSON.parse(cardsJson)
+    return Array.isArray(cards) ? cards : []
+  } catch (error) {
+    console.error('도감 카드 로드 에러:', error)
+    // 에러 발생 시 빈 배열 반환
+    return []
+  }
 }
 
 /**

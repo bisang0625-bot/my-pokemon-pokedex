@@ -13,12 +13,18 @@ export default function Pokedex() {
   const [expandedCard, setExpandedCard] = useState(null)
 
   useEffect(() => {
-    const savedCards = getCardsFromPokedex()
-    setCards(savedCards)
+    try {
+      const savedCards = getCardsFromPokedex()
+      setCards(savedCards || [])
 
-    // 파트너 정보 로드
-    const savedPartner = localStorage.getItem('partnerId')
-    setPartnerId(savedPartner)
+      // 파트너 정보 로드
+      const savedPartner = localStorage.getItem('partnerId')
+      setPartnerId(savedPartner)
+    } catch (error) {
+      console.error('도감 데이터 로드 에러:', error)
+      setCards([])
+      setPartnerId(null)
+    }
   }, [])
 
   const handleStarterSelect = (id) => {
@@ -39,66 +45,113 @@ export default function Pokedex() {
     partnerStatus = null;
   }
 
-  // 필터링 로직
+  // 필터링 로직 (에러 방지)
   const filteredCards = useMemo(() => {
-    let filtered = cards
+    try {
+      if (!cards || !Array.isArray(cards)) return []
+      
+      let filtered = cards
 
-    // 타입 필터 (한국어/영어 모두 처리)
-    if (selectedType !== 'all') {
-      filtered = filtered.filter(card => normalizeType(card.type) === selectedType)
+      // 타입 필터 (한국어/영어 모두 처리)
+      if (selectedType !== 'all') {
+        filtered = filtered.filter(card => {
+          try {
+            return normalizeType(card?.type) === selectedType
+          } catch {
+            return false
+          }
+        })
+      }
+
+      // 희귀도 필터
+      if (selectedRarity !== 'all') {
+        filtered = filtered.filter(card => {
+          try {
+            return card?.rarity === parseInt(selectedRarity)
+          } catch {
+            return false
+          }
+        })
+      }
+
+      // 검색 필터
+      if (searchTerm) {
+        filtered = filtered.filter(card => {
+          try {
+            return (
+              card?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              card?.nickname?.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+          } catch {
+            return false
+          }
+        })
+      }
+
+      return filtered
+    } catch (error) {
+      console.error('필터링 에러:', error)
+      return []
     }
-
-    // 희귀도 필터
-    if (selectedRarity !== 'all') {
-      filtered = filtered.filter(card => card.rarity === parseInt(selectedRarity))
-    }
-
-    // 검색 필터
-    if (searchTerm) {
-      filtered = filtered.filter(card =>
-        card.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        card.nickname?.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    }
-
-    return filtered
   }, [cards, selectedType, selectedRarity, searchTerm])
 
-  // 정렬
+  // 정렬 (에러 방지)
   const sortedCards = useMemo(() => {
-    const sorted = [...filteredCards].sort((a, b) => {
-      switch (sortBy) {
-        case 'hp':
-          return (b.hp || 0) - (a.hp || 0)
-        case 'rarity':
-          return (b.rarity || 0) - (a.rarity || 0)
-        case 'name':
-          return (a.name || '').localeCompare(b.name || '')
-        case 'power':
-          return (b.powerLevel || 0) - (a.powerLevel || 0)
-        case 'latest':
-        default:
-          return new Date(b.scannedAt || 0) - new Date(a.scannedAt || 0)
-      }
-    })
-    return sorted
+    try {
+      if (!filteredCards || !Array.isArray(filteredCards)) return []
+      
+      const sorted = [...filteredCards].sort((a, b) => {
+        try {
+          switch (sortBy) {
+            case 'hp':
+              return (b?.hp || 0) - (a?.hp || 0)
+            case 'rarity':
+              return (b?.rarity || 0) - (a?.rarity || 0)
+            case 'name':
+              return (a?.name || '').localeCompare(b?.name || '')
+            case 'power':
+              return (b?.powerLevel || 0) - (a?.powerLevel || 0)
+            case 'latest':
+            default:
+              const dateA = a?.scannedAt ? new Date(a.scannedAt).getTime() : 0
+              const dateB = b?.scannedAt ? new Date(b.scannedAt).getTime() : 0
+              return dateB - dateA
+          }
+        } catch {
+          return 0
+        }
+      })
+      return sorted
+    } catch (error) {
+      console.error('정렬 에러:', error)
+      return []
+    }
   }, [filteredCards, sortBy])
 
-  // 통계 계산
+  // 통계 계산 (에러 방지)
   const stats = useMemo(() => {
-    const rarityCounts = {
-      1: cards.filter(c => c.rarity === 1).length,
-      2: cards.filter(c => c.rarity === 2).length,
-      3: cards.filter(c => c.rarity === 3).length,
-      4: cards.filter(c => c.rarity === 4).length,
-      5: cards.filter(c => c.rarity === 5).length,
+    try {
+      if (!cards || !Array.isArray(cards)) {
+        return { rarityCounts: {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}, legendCards: 0, ultraRareCards: 0, rareCards: 0 }
+      }
+      
+      const rarityCounts = {
+        1: cards.filter(c => c?.rarity === 1).length,
+        2: cards.filter(c => c?.rarity === 2).length,
+        3: cards.filter(c => c?.rarity === 3).length,
+        4: cards.filter(c => c?.rarity === 4).length,
+        5: cards.filter(c => c?.rarity === 5).length,
+      }
+      // 희귀도 기반 카드 수
+      const legendCards = rarityCounts[5] || 0 // 5성 = 전설
+      const ultraRareCards = rarityCounts[4] || 0 // 4성 = 초희귀
+      const rareCards = rarityCounts[3] || 0 // 3성 = 희귀
+      
+      return { rarityCounts, legendCards, ultraRareCards, rareCards }
+    } catch (error) {
+      console.error('통계 계산 에러:', error)
+      return { rarityCounts: {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}, legendCards: 0, ultraRareCards: 0, rareCards: 0 }
     }
-    // 희귀도 기반 카드 수
-    const legendCards = rarityCounts[5] // 5성 = 전설
-    const ultraRareCards = rarityCounts[4] // 4성 = 초희귀
-    const rareCards = rarityCounts[3] // 3성 = 희귀
-    
-    return { rarityCounts, legendCards, ultraRareCards, rareCards }
   }, [cards])
 
   const deleteCard = (id) => {
@@ -123,24 +176,70 @@ export default function Pokedex() {
     }
   }
 
-  // 타입별 카드 수 (한국어/영어 모두 처리)
-  const typeCounts = {
-    all: cards.length,
-    fire: cards.filter(c => normalizeType(c.type) === 'fire').length,
-    water: cards.filter(c => normalizeType(c.type) === 'water').length,
-    grass: cards.filter(c => normalizeType(c.type) === 'grass').length,
-    electric: cards.filter(c => normalizeType(c.type) === 'electric').length
-  }
+  // 타입별 카드 수 (한국어/영어 모두 처리, 에러 방지)
+  const typeCounts = useMemo(() => {
+    try {
+      if (!cards || !Array.isArray(cards)) {
+        return { all: 0, fire: 0, water: 0, grass: 0, electric: 0 }
+      }
+      
+      return {
+        all: cards.length,
+        fire: cards.filter(c => {
+          try {
+            return normalizeType(c?.type) === 'fire'
+          } catch {
+            return false
+          }
+        }).length,
+        water: cards.filter(c => {
+          try {
+            return normalizeType(c?.type) === 'water'
+          } catch {
+            return false
+          }
+        }).length,
+        grass: cards.filter(c => {
+          try {
+            return normalizeType(c?.type) === 'grass'
+          } catch {
+            return false
+          }
+        }).length,
+        electric: cards.filter(c => {
+          try {
+            return normalizeType(c?.type) === 'electric'
+          } catch {
+            return false
+          }
+        }).length
+      }
+    } catch (error) {
+      console.error('타입별 카드 수 계산 에러:', error)
+      return { all: 0, fire: 0, water: 0, grass: 0, electric: 0 }
+    }
+  }, [cards])
 
-  // 희귀도별 카드 수
-  const rarityCounts = {
-    all: cards.length,
-    1: cards.filter(c => c.rarity === 1).length,
-    2: cards.filter(c => c.rarity === 2).length,
-    3: cards.filter(c => c.rarity === 3).length,
-    4: cards.filter(c => c.rarity === 4).length,
-    5: cards.filter(c => c.rarity === 5).length,
-  }
+  // 희귀도별 카드 수 (에러 방지)
+  const rarityCounts = useMemo(() => {
+    try {
+      if (!cards || !Array.isArray(cards)) {
+        return { all: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+      }
+      
+      return {
+        all: cards.length,
+        1: cards.filter(c => c?.rarity === 1).length,
+        2: cards.filter(c => c?.rarity === 2).length,
+        3: cards.filter(c => c?.rarity === 3).length,
+        4: cards.filter(c => c?.rarity === 4).length,
+        5: cards.filter(c => c?.rarity === 5).length,
+      }
+    } catch (error) {
+      console.error('희귀도별 카드 수 계산 에러:', error)
+      return { all: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+    }
+  }, [cards])
 
   // 타입 아이콘 (한국어/영어 모두 처리)
   const getTypeIcon = (type) => {
@@ -248,9 +347,14 @@ export default function Pokedex() {
   }
 
 
-  // 파트너 선택 전이라면 선택 화면 노출
-  if (!partnerId) {
-    return <StarterSelection onSelect={handleStarterSelect} />
+  // 파트너 선택 전이라면 선택 화면 노출 (에러 방지)
+  try {
+    if (!partnerId) {
+      return <StarterSelection onSelect={handleStarterSelect} />
+    }
+  } catch (error) {
+    console.error('파트너 선택 화면 렌더링 에러:', error)
+    // 에러 발생 시에도 기본 화면 표시
   }
 
   return (
