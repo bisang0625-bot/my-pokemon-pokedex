@@ -288,8 +288,12 @@ export default function Pokedex() {
               {partnerStatus.nextStage ? (
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs font-bold text-gray-500">
-                    <span>다음 진화: {partnerStatus.nextStage.name}</span>
-                    <span>남은 XP: {partnerStatus.xpForNext}</span>
+                    <span>다음 진화: {partnerStatus.nextStage.name} (레벨 {partnerStatus.nextStage.minLevel})</span>
+                    {partnerStatus.levelForNext !== null && partnerStatus.levelForNext > 0 ? (
+                      <span>레벨 {partnerStatus.levelForNext} 남음</span>
+                    ) : (
+                      <span>XP: {partnerStatus.xpForNext.toLocaleString()}</span>
+                    )}
                   </div>
                   <div className="h-6 bg-gray-100 rounded-full overflow-hidden border border-gray-200 relative">
                     <div
@@ -300,7 +304,7 @@ export default function Pokedex() {
                     </div>
                   </div>
                   <p className="text-xs text-gray-400 text-right">
-                    * 희귀한 카드를 모으면 더 빨리 성장해요!
+                    * 희귀한 카드를 모으면 더 빨리 성장해요! (현재 레벨: {partnerStatus.currentLevel})
                   </p>
                 </div>
               ) : (
