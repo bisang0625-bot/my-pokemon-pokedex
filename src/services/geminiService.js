@@ -67,8 +67,8 @@ export async function analyzeCard(imageBlob) {
 
     // 포켓몬 카드가 아니면 에러 발생
     if (!validation.isPokemonCard) {
-      const reason = validation.reason || "포켓몬 카드가 아닙니다.";
-      throw new Error(`포켓몬 카드를 스캔해주세요. ${reason}`);
+      const reason = validation.reason || "몬스터 카드가 아닙니다.";
+      throw new Error(`몬스터 카드를 스캔해주세요. ${reason}`);
     }
 
     // 비공식/위조 카드 여부 저장 (내부적으로만 사용, UI에는 표시 안 함)
@@ -111,7 +111,7 @@ export async function analyzeCard(imageBlob) {
 
     // 결과 검증
     if (!result.name || !result.hp || !result.type) {
-      throw new Error("카드 분석 정보가 불완전합니다. 포켓몬 카드를 명확하게 스캔해주세요.");
+      throw new Error("카드 분석 정보가 불완전합니다. 몬스터 카드를 명확하게 스캔해주세요.");
     }
 
     // 비공식/위조 카드 여부를 결과에 추가 (내부적으로만 사용, UI에는 표시 안 함)
@@ -123,8 +123,8 @@ export async function analyzeCard(imageBlob) {
     console.error("분석 에러 발생:", error);
     
     // 사용자 친화적인 에러 메시지
-    if (error.message.includes("포켓몬 카드")) {
-      throw error; // 포켓몬 카드가 아니라는 에러는 그대로 전달
+    if (error.message.includes("몬스터 카드") || error.message.includes("포켓몬 카드")) {
+      throw error; // 몬스터 카드가 아니라는 에러는 그대로 전달
     }
     
     // 할당량 초과 에러 처리

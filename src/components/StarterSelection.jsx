@@ -9,7 +9,7 @@ export default function StarterSelection({ onSelect }) {
                 <div className="bg-pokemon-blue p-6 sm:p-8 text-center text-white relative overflow-hidden flex-shrink-0">
                     <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png')] bg-repeat space-x-4"></div>
                     <h2 className="text-2xl sm:text-3xl font-black font-display relative z-10 mb-2">
-                        파트너 포켓몬을 선택하세요!
+                        파트너 몬스터를 선택하세요!
                     </h2>
                     <p className="text-blue-100 font-bold text-sm sm:text-base relative z-10">
                         앞으로 함께 모험을 떠날 친구를 골라주세요.
@@ -46,7 +46,7 @@ export default function StarterSelection({ onSelect }) {
                 </div>
 
                 <div className="p-3 sm:p-4 bg-gray-50 text-center text-gray-500 text-xs sm:text-sm font-bold border-t border-gray-100 flex-shrink-0">
-                    * 카드를 많이 모으면 포켓몬이 진화합니다!
+                    * 카드를 많이 모으면 몬스터가 진화합니다!
                 </div>
             </div>
         </div>

@@ -18,7 +18,7 @@ export default function TermsOfService() {
         <div className="prose prose-lg max-w-none space-y-6 text-gray-700">
           <section className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
             <p className="font-bold text-yellow-800">
-              ⚠️ 저작권 고지: 본 앱은 포켓몬 카드 이미지의 분석을 돕는 도구입니다. 
+              ⚠️ 저작권 고지: 본 앱은 몬스터 카드 이미지의 분석을 돕는 도구입니다. 
               포켓몬(Pokémon)은 Nintendo, Creatures Inc., Game Freak Inc.의 저작권 및 상표입니다. 
               본 앱은 공식 포켓몬 앱이 아니며, The Pokémon Company와 무관합니다.
             </p>
@@ -36,7 +36,7 @@ export default function TermsOfService() {
             <ul className="list-disc pl-6 space-y-2">
               <li>"앱"이란 포켓 카드 헌터: 몬스터 키우기 서비스를 의미합니다.</li>
               <li>"이용자"란 본 앱에 접속하여 본 약관에 따라 개발자가 제공하는 서비스를 받는 자를 의미합니다.</li>
-              <li>"서비스"란 개발자가 제공하는 포켓몬 카드 스캔 및 분석 서비스를 의미합니다.</li>
+              <li>"서비스"란 개발자가 제공하는 몬스터 카드 스캔 및 분석 서비스를 의미합니다.</li>
             </ul>
           </section>
 
@@ -52,7 +52,7 @@ export default function TermsOfService() {
             <h2 className="text-2xl font-bold text-pokemon-dark mb-4">제4조 (서비스의 제공 및 변경)</h2>
             <ul className="list-disc pl-6 space-y-2">
               <li>본 앱은 다음과 같은 서비스를 제공합니다:</li>
-              <li className="ml-4">- 포켓몬 카드 스캔 및 AI 분석 기능</li>
+              <li className="ml-4">- 몬스터 카드 스캔 및 AI 분석 기능</li>
               <li className="ml-4">- 수집한 카드의 도감 관리 기능</li>
               <li className="ml-4">- 카드 가치 추정 기능 (부모 모드)</li>
               <li>개발자는 필요한 경우 서비스의 내용을 변경할 수 있으며, 변경 시 사전에 공지합니다.</li>

@@ -65,7 +65,7 @@ export default function CameraScan() {
       
       // 추가 검증: 결과가 유효한지 확인
       if (!result || !result.name || !result.hp || !result.type) {
-        throw new Error('포켓몬 카드 정보를 올바르게 읽을 수 없습니다. 카드를 명확하게 스캔해주세요.')
+        throw new Error('몬스터 카드 정보를 올바르게 읽을 수 없습니다. 카드를 명확하게 스캔해주세요.')
       }
       
       setAnalysisResult(result)
@@ -75,7 +75,7 @@ export default function CameraScan() {
       setError(errorMessage)
       console.error('분석 오류:', err)
       
-      // 포켓몬 카드가 아닌 경우, 분석 결과를 초기화하고 다시 찍을 수 있도록 함
+      // 몬스터 카드가 아닌 경우, 분석 결과를 초기화하고 다시 찍을 수 있도록 함
       setAnalysisResult(null)
     } finally {
       setIsAnalyzing(false)
@@ -264,7 +264,7 @@ export default function CameraScan() {
             {isAnalyzing ? (
               <div className="bg-white rounded-2xl p-6 sm:p-8 text-center shadow-lg border-2 border-pokemon-yellow animate-pulse">
                 <div className="text-4xl mb-4 animate-spin-slow inline-block">⏳</div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">포켓몬 분석 중...</h3>
+                 <h3 className="text-xl font-bold text-gray-800 mb-2">몬스터 분석 중...</h3>
                 <p className="text-gray-500">도감을 펼치고 있어요!</p>
               </div>
             ) : (
@@ -295,7 +295,7 @@ export default function CameraScan() {
                         </p>
                         {!error.includes('할당량') && (
                           <p className="text-xs text-red-500 mt-2">
-                            💡 포켓몬 카드를 명확하게 스캔해주세요!
+                             💡 몬스터 카드를 명확하게 스캔해주세요!
                           </p>
                         )}
                       </div>

@@ -93,7 +93,7 @@ export default function Pokedex() {
   }, [cards])
 
   const deleteCard = (id) => {
-    if (window.confirm('정말 이 포켓몬 카드를 삭제하시겠습니까?')) {
+    if (window.confirm('정말 이 몬스터 카드를 삭제하시겠습니까?')) {
       try {
         const updatedCards = deleteCardFromPokedex(id)
         if (updatedCards.length === cards.length) {
@@ -248,7 +248,7 @@ export default function Pokedex() {
     <div className="min-h-screen pb-10">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl sm:text-4xl font-black text-pokemon-dark font-display drop-shadow-sm">
-          📚 내 포켓몬 도감
+          📚 내 몬스터 도감
         </h2>
         {/* 파트너 미니 표시 (모바일용) */}
         <div className="sm:hidden flex items-center gap-2 bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100">
@@ -257,7 +257,7 @@ export default function Pokedex() {
         </div>
       </div>
 
-      {/* 파트너 포켓몬 현황판 */}
+      {/* 파트너 몬스터 현황판 */}
       {partnerStatus && (
         <div className="mb-8 bg-white rounded-3xl p-6 border-4 border-pokemon-yellow shadow-xl relative overflow-hidden">
           <div className={`absolute top-0 right-0 w-64 h-64 ${partnerStatus.color} opacity-10 rounded-full blur-3xl transform translate-x-20 -translate-y-20`}></div>
@@ -341,7 +341,7 @@ export default function Pokedex() {
           <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-2xl">🔍</span>
           <input
             type="text"
-            placeholder="포켓몬 이름 또는 별명 검색..."
+            placeholder="몬스터 이름 또는 별명 검색..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-gray-200 shadow-sm focus:border-pokemon-blue focus:ring-4 focus:ring-pokemon-blue/20 transition-all text-lg font-bold"

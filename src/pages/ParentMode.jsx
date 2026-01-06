@@ -155,7 +155,7 @@ export default function ParentMode() {
                 <table className="w-full text-left">
                   <thead className="bg-gray-100 sticky top-0 z-10 border-b border-gray-200">
                     <tr>
-                      <th className="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">포켓몬</th>
+                      <th className="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">몬스터</th>
                       <th className="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">추정 가치</th>
                       <th className="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right text-xs sm:text-sm hidden sm:table-cell">범위</th>
                     </tr>

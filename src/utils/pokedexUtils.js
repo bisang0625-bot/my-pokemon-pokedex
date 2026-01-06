@@ -61,7 +61,7 @@ export function saveCardToPokedex(imageUrl, analysisResult) {
   const newCard = {
     id: Date.now().toString(),
     image: imageUrl,
-    name: analysisResult.name || '알 수 없는 포켓몬',
+    name: analysisResult.name || '알 수 없는 몬스터',
     type: typeEnglish, // 영어 코드로 저장
     typeKorean: analysisResult.type || '노말', // 한국어 타입도 별도로 저장 (표시용)
     hp: analysisResult.hp || 0,

@@ -32,7 +32,7 @@ export default function PrivacyPolicy() {
             <h2 className="text-2xl font-bold text-pokemon-dark mb-4">2. 수집하는 개인정보의 항목</h2>
             <p>본 앱은 다음과 같은 정보를 수집합니다:</p>
             <ul className="list-disc pl-6 space-y-2">
-              <li><strong>카메라 권한:</strong> 포켓몬 카드 스캔을 위해 필요합니다</li>
+              <li><strong>카메라 권한:</strong> 몬스터 카드 스캔을 위해 필요합니다</li>
               <li><strong>저장된 데이터:</strong> 스캔한 카드 이미지 및 분석 결과는 기기 내 로컬 스토리지에만 저장됩니다</li>
               <li><strong>API 키:</strong> 부모 모드에서 설정한 Gemini API 키는 기기 내에만 저장됩니다</li>
             </ul>
