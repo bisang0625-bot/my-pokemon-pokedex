@@ -34,9 +34,9 @@ export default function Pokedex() {
   const filteredCards = useMemo(() => {
     let filtered = cards
 
-    // 타입 필터
+    // 타입 필터 (한국어/영어 모두 처리)
     if (selectedType !== 'all') {
-      filtered = filtered.filter(card => card.type === selectedType)
+      filtered = filtered.filter(card => normalizeType(card.type) === selectedType)
     }
 
     // 희귀도 필터
@@ -114,13 +114,13 @@ export default function Pokedex() {
     }
   }
 
-  // 타입별 카드 수
+  // 타입별 카드 수 (한국어/영어 모두 처리)
   const typeCounts = {
     all: cards.length,
-    fire: cards.filter(c => c.type === 'fire').length,
-    water: cards.filter(c => c.type === 'water').length,
-    grass: cards.filter(c => c.type === 'grass').length,
-    electric: cards.filter(c => c.type === 'electric').length
+    fire: cards.filter(c => normalizeType(c.type) === 'fire').length,
+    water: cards.filter(c => normalizeType(c.type) === 'water').length,
+    grass: cards.filter(c => normalizeType(c.type) === 'grass').length,
+    electric: cards.filter(c => normalizeType(c.type) === 'electric').length
   }
 
   // 희귀도별 카드 수
@@ -133,35 +133,70 @@ export default function Pokedex() {
     5: cards.filter(c => c.rarity === 5).length,
   }
 
-  // 타입 아이콘
+  // 타입 아이콘 (한국어/영어 모두 처리)
   const getTypeIcon = (type) => {
+    const englishType = normalizeType(type);
     const icons = {
       fire: '🔥', water: '💧', grass: '🌿', electric: '⚡',
       psychic: '🔮', ice: '❄️', dragon: '🐉', dark: '🌑',
       fairy: '✨', normal: '⚪', fighting: '🥊',
       all: '🌈'
     }
-    return icons[type] || '✨'
+    return icons[englishType] || '✨'
   }
 
-  // 타입 색상
+  // 타입 색상 (한국어/영어 모두 처리)
   const getTypeColor = (type) => {
+    const englishType = normalizeType(type);
     const colors = {
       fire: 'bg-red-500', water: 'bg-blue-500', grass: 'bg-green-500', electric: 'bg-yellow-400',
       psychic: 'bg-pink-500', ice: 'bg-cyan-300', dragon: 'bg-purple-600', dark: 'bg-gray-700',
       fairy: 'bg-pink-300', normal: 'bg-gray-400', fighting: 'bg-red-700',
     }
-    return colors[type] || 'bg-gray-500'
+    return colors[englishType] || 'bg-gray-500'
   }
 
   const getTypeLabel = (type) => {
+    // 기존 카드는 한국어 타입을 가질 수 있으므로 변환
+    const koreanToEnglish = {
+      '불꽃': 'fire', '물': 'water', '풀': 'grass', '전기': 'electric',
+      '에스퍼': 'psychic', '얼음': 'ice', '드래곤': 'dragon', '악': 'dark',
+      '페어리': 'fairy', '노말': 'normal', '격투': 'fighting'
+    };
+    
+    // 한국어 타입이면 영어로 변환
+    const englishType = koreanToEnglish[type] || type;
+    
     const labels = {
       fire: '불꽃', water: '물', grass: '풀', electric: '전기',
       psychic: '에스퍼', ice: '얼음', dragon: '드래곤', dark: '악',
       fairy: '페어리', normal: '노말', fighting: '격투',
       all: '전체'
     }
-    return labels[type] || type
+    return labels[englishType] || type
+  }
+  
+  // 타입을 영어 코드로 정규화하는 함수
+  const normalizeType = (type) => {
+    if (!type) return 'normal';
+    
+    const koreanToEnglish = {
+      '불꽃': 'fire', '물': 'water', '풀': 'grass', '전기': 'electric',
+      '에스퍼': 'psychic', '얼음': 'ice', '드래곤': 'dragon', '악': 'dark',
+      '페어리': 'fairy', '노말': 'normal', '격투': 'fighting'
+    };
+    
+    // 한국어 타입이면 영어로 변환
+    if (koreanToEnglish[type]) {
+      return koreanToEnglish[type];
+    }
+    
+    // 이미 영어 코드인 경우
+    if (['fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy', 'normal', 'fighting'].includes(type.toLowerCase())) {
+      return type.toLowerCase();
+    }
+    
+    return 'normal';
   }
 
   // 희귀도별 별 표시

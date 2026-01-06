@@ -89,31 +89,57 @@ export default function CameraScan() {
     setIsScanning(false)
   }
 
+  // 타입을 영어 코드로 정규화하는 함수 (한국어/영어 모두 처리)
+  const normalizeType = (type) => {
+    if (!type) return 'normal';
+    
+    const koreanToEnglish = {
+      '불꽃': 'fire', '물': 'water', '풀': 'grass', '전기': 'electric',
+      '에스퍼': 'psychic', '얼음': 'ice', '드래곤': 'dragon', '악': 'dark',
+      '페어리': 'fairy', '노말': 'normal', '격투': 'fighting'
+    };
+    
+    // 한국어 타입이면 영어로 변환
+    if (koreanToEnglish[type]) {
+      return koreanToEnglish[type];
+    }
+    
+    // 이미 영어 코드인 경우
+    if (['fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy', 'normal', 'fighting'].includes(type.toLowerCase())) {
+      return type.toLowerCase();
+    }
+    
+    return 'normal';
+  }
+
   const getTypeLabel = (type) => {
+    const englishType = normalizeType(type);
     const typeMap = {
       fire: '불꽃', water: '물', grass: '풀', electric: '전기',
       psychic: '에스퍼', ice: '얼음', dragon: '드래곤', dark: '악',
       fairy: '페어리', normal: '노말', fighting: '격투'
     }
-    return typeMap[type] || type
+    return typeMap[englishType] || type
   }
 
   const getTypeColor = (type) => {
+    const englishType = normalizeType(type);
     const colorMap = {
       fire: 'bg-red-500', water: 'bg-blue-500', grass: 'bg-green-500', electric: 'bg-yellow-400',
       psychic: 'bg-pink-500', ice: 'bg-cyan-300', dragon: 'bg-purple-600', dark: 'bg-gray-700',
       fairy: 'bg-pink-300', normal: 'bg-gray-400', fighting: 'bg-red-700'
     }
-    return colorMap[type] || 'bg-gray-500'
+    return colorMap[englishType] || 'bg-gray-500'
   }
 
   const getTypeIcon = (type) => {
+    const englishType = normalizeType(type);
     const iconMap = {
       fire: '🔥', water: '💧', grass: '🌿', electric: '⚡',
       psychic: '🔮', ice: '❄️', dragon: '🐉', dark: '🌑',
       fairy: '✨', normal: '⚪', fighting: '🥊'
     }
-    return iconMap[type] || '✨'
+    return iconMap[englishType] || '✨'
   }
 
   // Viewfinder Overlay Component

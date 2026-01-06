@@ -3,6 +3,51 @@
  */
 
 /**
+ * 한국어 타입명을 영어 코드로 변환
+ * @param {string} koreanType - 한국어 타입명 (예: "불꽃", "물")
+ * @returns {string} 영어 타입 코드 (예: "fire", "water")
+ */
+function convertTypeToEnglish(koreanType) {
+  if (!koreanType) return 'normal';
+  
+  const typeMap = {
+    '불꽃': 'fire',
+    '물': 'water',
+    '풀': 'grass',
+    '전기': 'electric',
+    '에스퍼': 'psychic',
+    '얼음': 'ice',
+    '드래곤': 'dragon',
+    '악': 'dark',
+    '페어리': 'fairy',
+    '노말': 'normal',
+    '격투': 'fighting',
+    '비행': 'flying',
+    '독': 'poison',
+    '땅': 'ground',
+    '바위': 'rock',
+    '벌레': 'bug',
+    '고스트': 'ghost',
+    '강철': 'steel'
+  };
+  
+  // 이미 영어 코드인 경우 그대로 반환
+  if (typeMap.hasOwnProperty(koreanType)) {
+    return typeMap[koreanType];
+  }
+  
+  // 소문자로 변환 후 확인
+  const lowerType = koreanType.toLowerCase();
+  if (['fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy', 'normal', 'fighting'].includes(lowerType)) {
+    return lowerType;
+  }
+  
+  // 매칭되지 않으면 기본값 반환
+  console.warn('알 수 없는 타입:', koreanType);
+  return 'normal';
+}
+
+/**
  * 분석된 카드를 도감에 저장
  * @param {string} imageUrl - 카드 이미지 URL
  * @param {Object} analysisResult - 분석 결과 객체
@@ -10,11 +55,15 @@
 export function saveCardToPokedex(imageUrl, analysisResult) {
   const savedCards = JSON.parse(localStorage.getItem('pokedexCards') || '[]')
 
+  // 타입을 영어 코드로 변환
+  const typeEnglish = convertTypeToEnglish(analysisResult.type);
+
   const newCard = {
     id: Date.now().toString(),
     image: imageUrl,
     name: analysisResult.name || '알 수 없는 포켓몬',
-    type: analysisResult.type || '알 수 없음',
+    type: typeEnglish, // 영어 코드로 저장
+    typeKorean: analysisResult.type || '노말', // 한국어 타입도 별도로 저장 (표시용)
     hp: analysisResult.hp || 0,
     rarity: analysisResult.rarity || 1,
     description: analysisResult.description || '',
