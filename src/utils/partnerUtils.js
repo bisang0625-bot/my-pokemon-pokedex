@@ -90,24 +90,26 @@ export function calculateXP(cards) {
  * @returns {number} 현재 레벨 (1 이상)
  */
 export function calculateLevel(xp) {
-    if (xp <= 0) return 1;
+    if (xp < 0) return 1;
+    if (xp === 0) return 1;
     
     // 레벨업에 필요한 누적 XP 계산
     // 레벨 1 = 0 XP
-    // 레벨 2 = 100 XP
-    // 레벨 3 = 100 + 110 = 210 XP
-    // 레벨 4 = 210 + 120 = 330 XP
-    // 레벨 N = 레벨 N-1까지의 XP + (100 + (N-2) * 10)
+    // 레벨 2 = 100 XP (레벨 1→2에 100 XP 필요)
+    // 레벨 3 = 100 + 110 = 210 XP (레벨 2→3에 110 XP 필요)
+    // 레벨 4 = 210 + 120 = 330 XP (레벨 3→4에 120 XP 필요)
     
     let level = 1;
     let totalXpNeeded = 0;
     
-    while (totalXpNeeded <= xp && level < 999) {
-        const xpForNextLevel = level === 1 ? 0 : (100 + (level - 2) * 10);
-        totalXpNeeded += xpForNextLevel;
+    while (level < 999) {
+        // 다음 레벨까지 필요한 XP 계산
+        const xpForNextLevel = level === 1 ? 100 : (100 + (level - 1) * 10);
+        const nextTotalXp = totalXpNeeded + xpForNextLevel;
         
-        if (xp >= totalXpNeeded) {
+        if (xp >= nextTotalXp) {
             level++;
+            totalXpNeeded = nextTotalXp;
         } else {
             break;
         }
@@ -140,7 +142,10 @@ export function getPartnerStatus(partnerId, currentXp) {
     const currentLevel = calculateLevel(currentXp);
     
     // 레벨에 따른 현재 진화 단계 찾기
-    let currentStage = partner.stages[0];
+    let currentStage = {
+        ...partner.stages[0],
+        level: currentLevel  // 기본값에도 레벨 추가
+    };
     let nextStage = null;
     
     for (let i = 0; i < partner.stages.length; i++) {

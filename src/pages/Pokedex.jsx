@@ -272,7 +272,7 @@ export default function Pokedex() {
               </div>
               <div className="absolute -bottom-2 w-full text-center">
                 <span className={`bg-white px-3 py-1 rounded-full text-sm font-black shadow-sm border ${partnerStatus.borderColor} ${partnerStatus.textColor}`}>
-                  Lv.{partnerStatus.stage.level}
+                  Lv.{partnerStatus.stage?.level || partnerStatus.currentLevel || 1}
                 </span>
               </div>
             </div>
