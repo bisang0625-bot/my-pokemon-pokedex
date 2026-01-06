@@ -247,13 +247,13 @@ export default function CameraScan() {
         </div>
       ) : (
         <div className="flex flex-col min-h-[calc(100vh-200px)] sm:min-h-auto">
-          {/* 이미지 섹션 - 모바일에서 높이 제한 */}
+          {/* 이미지 섹션 - 모바일에서 스크롤 가능하도록 */}
           <div className="flex-shrink-0 mb-4 sm:mb-6">
-            <div className="relative rounded-2xl overflow-hidden shadow-lg border-4 border-white max-w-sm mx-auto max-h-[40vh] sm:max-h-none">
+            <div className="relative rounded-2xl overflow-visible shadow-lg border-4 border-white max-w-sm mx-auto">
               <img
                 src={capturedImage}
                 alt="촬영된 카드"
-                className="w-full h-auto object-contain"
+                className="w-full h-auto object-contain rounded-xl"
               />
               <div className="absolute inset-0 ring-4 ring-black/10 rounded-2xl pointer-events-none"></div>
             </div>
