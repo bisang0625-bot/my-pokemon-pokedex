@@ -90,32 +90,45 @@ export function calculateXP(cards) {
  * @returns {number} 현재 레벨 (1 이상)
  */
 export function calculateLevel(xp) {
-    if (xp < 0) return 1;
-    if (xp === 0) return 1;
-    
-    // 레벨업에 필요한 누적 XP 계산
-    // 레벨 1 = 0 XP
-    // 레벨 2 = 100 XP (레벨 1→2에 100 XP 필요)
-    // 레벨 3 = 100 + 110 = 210 XP (레벨 2→3에 110 XP 필요)
-    // 레벨 4 = 210 + 120 = 330 XP (레벨 3→4에 120 XP 필요)
-    
-    let level = 1;
-    let totalXpNeeded = 0;
-    
-    while (level < 999) {
-        // 다음 레벨까지 필요한 XP 계산
-        const xpForNextLevel = level === 1 ? 100 : (100 + (level - 1) * 10);
-        const nextTotalXp = totalXpNeeded + xpForNextLevel;
+    try {
+        // null, undefined, NaN 체크
+        if (xp === null || xp === undefined || isNaN(xp)) return 1;
         
-        if (xp >= nextTotalXp) {
-            level++;
-            totalXpNeeded = nextTotalXp;
-        } else {
-            break;
+        // 음수 체크
+        const validXp = Math.max(0, Number(xp));
+        if (validXp === 0) return 1;
+        
+        // 레벨업에 필요한 누적 XP 계산
+        // 레벨 1 = 0 XP
+        // 레벨 2 = 100 XP (레벨 1→2에 100 XP 필요)
+        // 레벨 3 = 100 + 110 = 210 XP (레벨 2→3에 110 XP 필요)
+        // 레벨 4 = 210 + 120 = 330 XP (레벨 3→4에 120 XP 필요)
+        
+        let level = 1;
+        let totalXpNeeded = 0;
+        let iterations = 0;
+        const maxIterations = 1000; // 무한 루프 방지
+        
+        while (level < 999 && iterations < maxIterations) {
+            iterations++;
+            
+            // 다음 레벨까지 필요한 XP 계산
+            const xpForNextLevel = level === 1 ? 100 : (100 + (level - 1) * 10);
+            const nextTotalXp = totalXpNeeded + xpForNextLevel;
+            
+            if (validXp >= nextTotalXp) {
+                level++;
+                totalXpNeeded = nextTotalXp;
+            } else {
+                break;
+            }
         }
+        
+        return Math.min(level, 999);
+    } catch (error) {
+        console.error('calculateLevel error:', error);
+        return 1; // 에러 발생 시 기본값 반환
     }
-    
-    return Math.min(level, 999);
 }
 
 /**
@@ -135,77 +148,105 @@ export function getXpForLevel(targetLevel) {
 }
 
 export function getPartnerStatus(partnerId, currentXp) {
-    const partner = PARTNERS[partnerId];
-    if (!partner) return null;
-
-    // XP를 레벨로 변환
-    const currentLevel = calculateLevel(currentXp);
-    
-    // 레벨에 따른 현재 진화 단계 찾기
-    let currentStage = {
-        ...partner.stages[0],
-        level: currentLevel  // 기본값에도 레벨 추가
-    };
-    let nextStage = null;
-    
-    for (let i = 0; i < partner.stages.length; i++) {
-        const stage = partner.stages[i];
-        if (currentLevel >= stage.minLevel && currentLevel <= stage.maxLevel) {
-            currentStage = {
-                ...stage,
-                level: currentLevel  // 현재 레벨 추가
-            };
-            
-            // 다음 진화 단계 찾기
-            if (i < partner.stages.length - 1) {
-                nextStage = partner.stages[i + 1];
-            }
-            break;
+    try {
+        // 안전장치: partnerId와 currentXp 검증
+        if (!partnerId || !PARTNERS[partnerId]) {
+            console.warn('Invalid partnerId:', partnerId);
+            return null;
         }
-    }
-    
-    // 다음 진화 단계까지의 진행도 계산
-    let progress = 100;
-    let xpForNext = 0;
-    let levelForNext = null;
-
-    if (nextStage) {
-        // 다음 진화 단계에 도달하기 위한 목표 레벨
-        const targetLevel = nextStage.minLevel;
         
-        // 현재 레벨이 다음 진화 단계 레벨 범위에 있는지 확인
-        if (currentLevel < targetLevel) {
-            // 현재 단계 내에서의 진행도 계산
-            const currentStageMinLevel = currentStage.minLevel;
-            const currentStageMaxLevel = currentStage.maxLevel;
-            const currentStageLevelRange = currentStageMaxLevel - currentStageMinLevel + 1;
-            const currentLevelInStage = currentLevel - currentStageMinLevel;
-            
-            // 현재 단계 내에서의 진행도 (0-100%)
-            progress = Math.min((currentLevelInStage / currentStageLevelRange) * 100, 100);
-            
-            // 다음 단계까지 남은 레벨
-            levelForNext = targetLevel - currentLevel;
-            
-            // 다음 단계까지 필요한 XP 계산
-            const xpForTargetLevel = getXpForLevel(targetLevel);
-            xpForNext = Math.max(0, xpForTargetLevel - currentXp);
-        } else {
-            // 이미 다음 단계 레벨에 도달했지만 아직 진화하지 않은 경우
-            progress = 100;
-            levelForNext = 0;
-            xpForNext = 0;
-        }
-    }
+        const partner = PARTNERS[partnerId];
+        
+        // currentXp 검증
+        const validXp = currentXp === null || currentXp === undefined || isNaN(currentXp) 
+            ? 0 
+            : Math.max(0, Number(currentXp));
 
-    return {
-        ...partner,
-        stage: currentStage,      // 현재 모습 (레벨 포함)
-        nextStage,                // 다음 진화 모습
-        progress,                 // 다음 진화까지 진행도 (%)
-        xpForNext,                // 다음 진화까지 남은 XP
-        levelForNext,             // 다음 진화까지 남은 레벨
-        currentLevel,             // 현재 레벨
-        currentXp                 // 현재 XP
-    };
+        // XP를 레벨로 변환
+        const currentLevel = calculateLevel(validXp);
+        
+        // stages 배열 검증
+        if (!partner.stages || partner.stages.length === 0) {
+            console.error('Partner stages not found:', partnerId);
+            return null;
+        }
+        
+        // 레벨에 따른 현재 진화 단계 찾기
+        let currentStage = {
+            ...partner.stages[0],
+            level: currentLevel  // 기본값에도 레벨 추가
+        };
+        let nextStage = null;
+        
+        for (let i = 0; i < partner.stages.length; i++) {
+            const stage = partner.stages[i];
+            if (!stage || stage.minLevel === undefined || stage.maxLevel === undefined) {
+                console.warn('Invalid stage:', stage);
+                continue;
+            }
+            
+            if (currentLevel >= stage.minLevel && currentLevel <= stage.maxLevel) {
+                currentStage = {
+                    ...stage,
+                    level: currentLevel  // 현재 레벨 추가
+                };
+                
+                // 다음 진화 단계 찾기
+                if (i < partner.stages.length - 1) {
+                    nextStage = partner.stages[i + 1];
+                }
+                break;
+            }
+        }
+        
+        // 다음 진화 단계까지의 진행도 계산
+        let progress = 100;
+        let xpForNext = 0;
+        let levelForNext = null;
+
+        if (nextStage && nextStage.minLevel !== undefined) {
+            // 다음 진화 단계에 도달하기 위한 목표 레벨
+            const targetLevel = nextStage.minLevel;
+            
+            // 현재 레벨이 다음 진화 단계 레벨 범위에 있는지 확인
+            if (currentLevel < targetLevel) {
+                // 현재 단계 내에서의 진행도 계산
+                const currentStageMinLevel = currentStage.minLevel || 1;
+                const currentStageMaxLevel = currentStage.maxLevel || 9;
+                const currentStageLevelRange = currentStageMaxLevel - currentStageMinLevel + 1;
+                const currentLevelInStage = currentLevel - currentStageMinLevel;
+                
+                // 현재 단계 내에서의 진행도 (0-100%)
+                progress = currentStageLevelRange > 0 
+                    ? Math.min(Math.max((currentLevelInStage / currentStageLevelRange) * 100, 0), 100)
+                    : 0;
+                
+                // 다음 단계까지 남은 레벨
+                levelForNext = targetLevel - currentLevel;
+                
+                // 다음 단계까지 필요한 XP 계산
+                const xpForTargetLevel = getXpForLevel(targetLevel);
+                xpForNext = Math.max(0, xpForTargetLevel - validXp);
+            } else {
+                // 이미 다음 단계 레벨에 도달했지만 아직 진화하지 않은 경우
+                progress = 100;
+                levelForNext = 0;
+                xpForNext = 0;
+            }
+        }
+
+        return {
+            ...partner,
+            stage: currentStage,      // 현재 모습 (레벨 포함)
+            nextStage,                // 다음 진화 모습
+            progress: Math.max(0, Math.min(100, progress)),  // 0-100 범위 보장
+            xpForNext,                // 다음 진화까지 남은 XP
+            levelForNext,             // 다음 진화까지 남은 레벨
+            currentLevel,             // 현재 레벨
+            currentXp: validXp        // 현재 XP
+        };
+    } catch (error) {
+        console.error('getPartnerStatus error:', error);
+        return null; // 에러 발생 시 null 반환
+    }
 }

@@ -26,9 +26,18 @@ export default function Pokedex() {
     setPartnerId(id)
   }
 
-  // 파트너 상태 계산
-  const totalXP = calculateXP(cards)
-  const partnerStatus = partnerId ? getPartnerStatus(partnerId, totalXP) : null
+  // 파트너 상태 계산 (에러 방지)
+  let totalXP = 0;
+  let partnerStatus = null;
+  
+  try {
+    totalXP = calculateXP(cards) || 0;
+    partnerStatus = partnerId ? getPartnerStatus(partnerId, totalXP) : null;
+  } catch (error) {
+    console.error('파트너 상태 계산 에러:', error);
+    totalXP = 0;
+    partnerStatus = null;
+  }
 
   // 필터링 로직
   const filteredCards = useMemo(() => {
