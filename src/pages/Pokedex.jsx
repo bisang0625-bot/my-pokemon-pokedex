@@ -32,6 +32,35 @@ export default function Pokedex() {
     setPartnerId(id)
   }
 
+  // 타입을 영어 코드로 정규화하는 함수 (먼저 정의)
+  const normalizeType = (type) => {
+    if (!type) return 'normal';
+    
+    const koreanToEnglish = {
+      '불꽃': 'fire', '물': 'water', '풀': 'grass', '전기': 'electric',
+      '에스퍼': 'psychic', '얼음': 'ice', '드래곤': 'dragon', '악': 'dark',
+      '페어리': 'fairy', '노말': 'normal', '격투': 'fighting'
+    };
+    
+    // 한국어 타입이면 영어로 변환
+    if (koreanToEnglish[type]) {
+      return koreanToEnglish[type];
+    }
+    
+    // 이미 영어 코드인 경우
+    const lowerType = String(type).toLowerCase();
+    if (['fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy', 'normal', 'fighting'].includes(lowerType)) {
+      return lowerType;
+    }
+    
+    // 디버깅: 알 수 없는 타입 로그
+    if (type !== 'normal') {
+      console.warn('알 수 없는 타입:', type, '기본값 normal 반환');
+    }
+    
+    return 'normal';
+  }
+
   // 파트너 상태 계산 (에러 방지)
   let totalXP = 0;
   let partnerStatus = null;
@@ -183,37 +212,34 @@ export default function Pokedex() {
         return { all: 0, fire: 0, water: 0, grass: 0, electric: 0 }
       }
       
-      return {
+      // 디버깅: 카드 타입 확인
+      console.log('타입별 카드 수 계산 - 전체 카드:', cards.length);
+      cards.forEach(card => {
+        console.log('카드:', card.name, '타입:', card.type, '정규화된 타입:', normalizeType(card?.type));
+      });
+      
+      const counts = {
         all: cards.length,
-        fire: cards.filter(c => {
-          try {
-            return normalizeType(c?.type) === 'fire'
-          } catch {
-            return false
-          }
-        }).length,
-        water: cards.filter(c => {
-          try {
-            return normalizeType(c?.type) === 'water'
-          } catch {
-            return false
-          }
-        }).length,
-        grass: cards.filter(c => {
-          try {
-            return normalizeType(c?.type) === 'grass'
-          } catch {
-            return false
-          }
-        }).length,
-        electric: cards.filter(c => {
-          try {
-            return normalizeType(c?.type) === 'electric'
-          } catch {
-            return false
-          }
-        }).length
-      }
+        fire: 0,
+        water: 0,
+        grass: 0,
+        electric: 0
+      };
+      
+      cards.forEach(card => {
+        try {
+          const normalizedType = normalizeType(card?.type);
+          if (normalizedType === 'fire') counts.fire++;
+          else if (normalizedType === 'water') counts.water++;
+          else if (normalizedType === 'grass') counts.grass++;
+          else if (normalizedType === 'electric') counts.electric++;
+        } catch (err) {
+          console.warn('카드 타입 정규화 에러:', card?.name, card?.type, err);
+        }
+      });
+      
+      console.log('계산된 타입별 카드 수:', counts);
+      return counts;
     } catch (error) {
       console.error('타입별 카드 수 계산 에러:', error)
       return { all: 0, fire: 0, water: 0, grass: 0, electric: 0 }
@@ -265,15 +291,8 @@ export default function Pokedex() {
   }
 
   const getTypeLabel = (type) => {
-    // 기존 카드는 한국어 타입을 가질 수 있으므로 변환
-    const koreanToEnglish = {
-      '불꽃': 'fire', '물': 'water', '풀': 'grass', '전기': 'electric',
-      '에스퍼': 'psychic', '얼음': 'ice', '드래곤': 'dragon', '악': 'dark',
-      '페어리': 'fairy', '노말': 'normal', '격투': 'fighting'
-    };
-    
-    // 한국어 타입이면 영어로 변환
-    const englishType = koreanToEnglish[type] || type;
+    // normalizeType 함수 사용
+    const englishType = normalizeType(type);
     
     const labels = {
       fire: '불꽃', water: '물', grass: '풀', electric: '전기',
@@ -282,29 +301,6 @@ export default function Pokedex() {
       all: '전체'
     }
     return labels[englishType] || type
-  }
-  
-  // 타입을 영어 코드로 정규화하는 함수
-  const normalizeType = (type) => {
-    if (!type) return 'normal';
-    
-    const koreanToEnglish = {
-      '불꽃': 'fire', '물': 'water', '풀': 'grass', '전기': 'electric',
-      '에스퍼': 'psychic', '얼음': 'ice', '드래곤': 'dragon', '악': 'dark',
-      '페어리': 'fairy', '노말': 'normal', '격투': 'fighting'
-    };
-    
-    // 한국어 타입이면 영어로 변환
-    if (koreanToEnglish[type]) {
-      return koreanToEnglish[type];
-    }
-    
-    // 이미 영어 코드인 경우
-    if (['fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy', 'normal', 'fighting'].includes(type.toLowerCase())) {
-      return type.toLowerCase();
-    }
-    
-    return 'normal';
   }
 
   // 희귀도별 별 표시
