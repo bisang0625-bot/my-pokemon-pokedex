@@ -244,20 +244,38 @@ export default function CameraScan() {
             ) : (
               !analysisResult && (
                 <div className="flex flex-col gap-3 max-w-sm mx-auto w-full px-4 sm:px-0">
-                  {error && (
-                    <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 mb-2">
-                      <div className="flex items-start gap-2">
-                        <span className="text-2xl">⚠️</span>
-                        <div className="flex-1">
-                          <h4 className="font-bold text-red-700 mb-1">분석 실패</h4>
-                          <p className="text-sm text-red-600">{error}</p>
+                {error && (
+                  <div className={`border-2 rounded-xl p-4 mb-2 ${
+                    error.includes('할당량') || error.includes('quota') 
+                      ? 'bg-yellow-50 border-yellow-200' 
+                      : 'bg-red-50 border-red-200'
+                  }`}>
+                    <div className="flex items-start gap-2">
+                      <span className="text-2xl">{error.includes('할당량') ? '⏰' : '⚠️'}</span>
+                      <div className="flex-1">
+                        <h4 className={`font-bold mb-1 ${
+                          error.includes('할당량') 
+                            ? 'text-yellow-700' 
+                            : 'text-red-700'
+                        }`}>
+                          {error.includes('할당량') ? '분석 제한 안내' : '분석 실패'}
+                        </h4>
+                        <p className={`text-sm ${
+                          error.includes('할당량') 
+                            ? 'text-yellow-600' 
+                            : 'text-red-600'
+                        }`}>
+                          {error}
+                        </p>
+                        {!error.includes('할당량') && (
                           <p className="text-xs text-red-500 mt-2">
                             💡 포켓몬 카드를 명확하게 스캔해주세요!
                           </p>
-                        </div>
+                        )}
                       </div>
                     </div>
-                  )}
+                  </div>
+                )}
                   <button
                     onClick={analyzeImage}
                     className="w-full py-4 bg-gradient-to-r from-pokemon-blue to-blue-600 text-white rounded-2xl font-black text-xl shadow-lg hover:scale-105 transition-transform flex items-center justify-center gap-2"

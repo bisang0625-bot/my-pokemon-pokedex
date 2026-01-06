@@ -107,11 +107,28 @@ export async function analyzeCard(imageBlob) {
 
   } catch (error) {
     console.error("분석 에러 발생:", error);
+    
     // 사용자 친화적인 에러 메시지
     if (error.message.includes("포켓몬 카드")) {
       throw error; // 포켓몬 카드가 아니라는 에러는 그대로 전달
     }
-    throw new Error(`카드 분석 오류: ${error.message}`);
+    
+    // 할당량 초과 에러 처리
+    if (error.message.includes("429") || error.message.includes("quota") || error.message.includes("Quota exceeded")) {
+      const retryMatch = error.message.match(/Please retry in (\d+)/);
+      const retrySeconds = retryMatch ? parseInt(retryMatch[1]) : 60;
+      const retryMinutes = Math.ceil(retrySeconds / 60);
+      
+      throw new Error(`오늘 카드 분석 할당량을 모두 사용했어요. ${retryMinutes}분 후에 다시 시도해주세요! 🕐`);
+    }
+    
+    // 네트워크 에러 처리
+    if (error.message.includes("fetch") || error.message.includes("network")) {
+      throw new Error("인터넷 연결을 확인해주세요. 네트워크 오류가 발생했습니다.");
+    }
+    
+    // 기타 에러
+    throw new Error(`카드 분석 중 오류가 발생했습니다: ${error.message}`);
   }
 }
 
