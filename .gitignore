@@ -29,5 +29,13 @@ dist-ssr
 .env.production.local
 .env.development.local
 
+# Capacitor / Native builds
+android/
+ios/
+capacitor.config.cjs
+*.jks
+*.keystore
+.vercel
+
 
 

@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { getCardsFromPokedex } from '../utils/pokedexUtils'
 import { calculateTotalValue, estimateCardPrice, formatPrice, getRealCardPrice } from '../services/priceService'
+import ParentalGate from '../components/ParentalGate'
 
 export default function ParentMode() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [stats, setStats] = useState({
     totalCards: 0,
     lastScanDate: null
@@ -12,6 +14,9 @@ export default function ParentMode() {
   const [isLoadingPrices, setIsLoadingPrices] = useState(false)
 
   useEffect(() => {
+    // 이미 세션에 인증 정보가 있다면 스킵할 수도 있지만,
+    // 부모 모드는 들어올 때마다 확인하는 것이 안전하므로 여기서는 매번 확인하도록 둠.
+    // 만약 새로고침 시 유지를 원하면 sessionStorage를 사용할 수 있음.
     loadStats()
   }, [])
 
@@ -45,9 +50,9 @@ export default function ParentMode() {
 
       setCardPrices(pricesWithRealData)
 
+      const totalEstimated = pricesWithRealData.reduce((sum, card) => sum + (card.price.estimated || 0), 0)
       const totalMin = pricesWithRealData.reduce((sum, card) => sum + (card.price.min || 0), 0)
       const totalMax = pricesWithRealData.reduce((sum, card) => sum + (card.price.max || 0), 0)
-      const totalEstimated = pricesWithRealData.reduce((sum, card) => sum + (card.price.estimated || 0), 0)
 
       setTotalValue({
         totalMin,
@@ -76,99 +81,130 @@ export default function ParentMode() {
     }
   }
 
+  if (!isAuthenticated) {
+    return <ParentalGate onSuccess={() => setIsAuthenticated(true)} />
+  }
+
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="bg-white rounded-lg shadow-lg p-8">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-800">👨‍👩‍👧 부모 관리 모드</h2>
-          <span className="text-sm text-green-600 font-semibold bg-green-50 px-3 py-1 rounded-full border border-green-200">
-            보안 연결됨 (ENV)
+    <div className="max-w-4xl mx-auto pb-8">
+      <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-10 border-4 border-pokemon-blue/10 animate-fade-in-up">
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+          <h2 className="text-3xl font-black text-pokemon-dark font-display flex items-center gap-3">
+            <span className="text-4xl">👨‍👩‍👧</span> 부모님 설정
+          </h2>
+          <span className="text-sm font-bold text-green-600 bg-green-100 px-4 py-2 rounded-full border border-green-200 shadow-sm flex items-center gap-2">
+            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+            보안 연결됨
           </span>
         </div>
 
-        <div className="space-y-6">
-          {/* 통계 섹션 */}
-          <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
-            <h3 className="text-lg font-semibold mb-4 text-gray-800">수집 통계</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-600">총 수집 카드</p>
-                <p className="text-xl sm:text-2xl font-bold text-blue-600">{stats.totalCards}장</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">마지막 스캔</p>
-                <p className="text-lg font-semibold text-blue-600">
-                  {stats.lastScanDate ? new Date(stats.lastScanDate).toLocaleDateString('ko-KR') : '없음'}
-                </p>
-              </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          {/* 통계 카드 */}
+          <div className="bg-blue-50 rounded-2xl p-6 border-2 border-blue-100 shadow-sm hover:shadow-md transition-shadow">
+            <h3 className="text-lg font-bold text-blue-800 mb-4 flex items-center gap-2">
+              📊 수집 현황
+            </h3>
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-gray-600">총 수집 카드</span>
+              <span className="text-3xl font-black text-blue-600">{stats.totalCards}장</span>
+            </div>
+            <div className="flex justify-between items-center border-t border-blue-200 pt-3">
+              <span className="text-sm text-gray-500">마지막 활동</span>
+              <span className="text-sm font-bold text-blue-700">
+                {stats.lastScanDate ? new Date(stats.lastScanDate).toLocaleDateString('ko-KR') : '-'}
+              </span>
             </div>
           </div>
 
-          {/* 시세 정보 섹션 */}
-          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-6 border-2 border-green-300 shadow-lg">
-            <h3 className="text-xl font-bold mb-4 text-gray-800 flex items-center gap-2">
-              💰 카드 가치 분석
+          {/* 가치 카드 */}
+          <div className="bg-green-50 rounded-2xl p-6 border-2 border-green-100 shadow-sm hover:shadow-md transition-shadow">
+            <h3 className="text-lg font-bold text-green-800 mb-4 flex items-center gap-2">
+              💰 가치 분석
             </h3>
-
             {isLoadingPrices ? (
-              <div className="text-center py-4">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mb-2"></div>
-                <p className="text-gray-600 text-sm">AI 시세 조회 중...</p>
-              </div>
-            ) : totalValue ? (
-              <div className="space-y-4">
-                <div className="bg-white rounded-lg p-4 border-2 border-green-400 shadow-md">
-                  <p className="text-sm text-gray-600 mb-1">총 예상 가치</p>
-                  <p className="text-2xl sm:text-3xl font-black text-green-600 break-words">{formatPrice(totalValue.totalEstimated)}</p>
-                  <p className="text-xs text-gray-400 mt-2">평균 카드 가격: {formatPrice(totalValue.averagePrice)}</p>
-                </div>
-
-                {/* 개별 카드 가치 목록 */}
-                {cardPrices.length > 0 && (
-                  <details className="bg-white rounded-lg p-4 border border-green-300">
-                    <summary className="cursor-pointer font-semibold text-gray-700 hover:text-green-600 transition-colors">
-                      📋 카드별 가치 상세보기 ({cardPrices.length}장)
-                    </summary>
-                    <div className="mt-4 space-y-2 max-h-96 overflow-y-auto">
-                      {[...cardPrices].sort((a, b) => (b.price?.estimated || 0) - (a.price?.estimated || 0)).map((card) => (
-                        <div key={card.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200">
-                          {card.image && (
-                            <img src={card.image} alt={card.name} className="w-12 h-12 flex-shrink-0 rounded object-cover border border-gray-300" />
-                          )}
-                          <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-gray-800 truncate">{card.name || '알 수 없음'}</p>
-                            <p className="text-xs text-gray-500">
-                              {card.price?.isRealPrice ? '🤖 AI 시세' : '📊 추정가'}
-                            </p>
-                          </div>
-                          <div className="text-right flex-shrink-0">
-                            <p className="font-bold text-green-600 whitespace-nowrap">{formatPrice(card.price?.estimated || 0)}</p>
-                            <p className="text-xs text-gray-500 whitespace-nowrap">
-                              {formatPrice(card.price?.min || 0)} ~ {formatPrice(card.price?.max || 0)}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </details>
-                )}
+              <div className="flex items-center gap-2 text-green-600 font-bold animate-pulse">
+                <span className="text-2xl">⏳</span> 계산 중...
               </div>
             ) : (
-              <p className="text-center text-gray-500 py-4">수집한 카드가 없습니다.</p>
+              <>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-600">총 추정 가치</span>
+                  <span className="text-3xl font-black text-green-600 tracking-tight">
+                    {totalValue ? formatPrice(totalValue.totalEstimated) : '0원'}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center border-t border-green-200 pt-3">
+                  <span className="text-sm text-gray-500">평균 단가</span>
+                  <span className="text-sm font-bold text-green-700">
+                    {totalValue ? formatPrice(totalValue.averagePrice) : '0원'}
+                  </span>
+                </div>
+              </>
             )}
           </div>
+        </div>
 
-          {/* 데이터 관리 섹션 */}
-          <div className="bg-red-50 rounded-lg p-6 border border-red-200">
-            <h3 className="text-lg font-semibold mb-4 text-gray-800 text-red-700">데이터 관리</h3>
-            <button
-              onClick={clearAllData}
-              className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-semibold shadow-md"
-            >
-              모든 데이터 초기화
-            </button>
-            <p className="mt-2 text-xs text-gray-500">주의: 모든 카드 도감 정보가 스마트폰에서 영구적으로 삭제됩니다.</p>
+        {/* 상세 목록 */}
+        {cardPrices.length > 0 && (
+          <div className="mb-8">
+            <h3 className="text-xl font-bold text-gray-700 mb-4 px-2">📋 보유 카드 목록</h3>
+            <div className="bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden max-h-[500px] overflow-y-auto custom-scrollbar">
+              {isLoadingPrices ? (
+                <div className="p-8 text-center text-gray-500">데이터를 불러오는 중입니다...</div>
+              ) : (
+                <table className="w-full text-left">
+                  <thead className="bg-gray-100 sticky top-0 z-10 border-b border-gray-200">
+                    <tr>
+                      <th className="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">포켓몬</th>
+                      <th className="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">추정 가치</th>
+                      <th className="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right text-xs sm:text-sm hidden sm:table-cell">범위</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {[...cardPrices].sort((a, b) => (b.price?.estimated || 0) - (a.price?.estimated || 0)).map((card) => (
+                      <tr key={card.id} className="hover:bg-white transition-colors">
+                        <td className="p-4 flex items-center gap-3">
+                          {card.image ? (
+                            <img src={card.image} alt={card.name} className="w-10 h-14 object-cover rounded shadow-sm border border-gray-200" />
+                          ) : (
+                            <div className="w-10 h-14 bg-gray-200 rounded"></div>
+                          )}
+                          <div>
+                            <p className="font-bold text-gray-800">{card.name}</p>
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-600 font-bold">
+                              {card.price?.isRealPrice ? 'AI 분석' : '추정'}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="p-4 text-right font-black text-green-600">
+                          {formatPrice(card.price?.estimated || 0)}
+                        </td>
+                        <td className="p-4 text-right text-xs text-gray-500 hidden sm:table-cell">
+                          {formatPrice(card.price?.min || 0)} ~ {formatPrice(card.price?.max || 0)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
           </div>
+        )}
+
+        {/* 데이터 초기화 */}
+        <div className="bg-red-50 p-6 rounded-2xl border border-red-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <h3 className="text-lg font-bold text-red-700 mb-1">⚠️ 데이터 초기화</h3>
+            <p className="text-sm text-red-600/80">
+              아이의 카드 도감 데이터를 모두 삭제합니다.
+            </p>
+          </div>
+          <button
+            onClick={clearAllData}
+            className="px-6 py-3 bg-white border-2 border-red-200 text-red-600 rounded-xl hover:bg-red-50 hover:border-red-400 transition-all font-bold shadow-sm whitespace-nowrap"
+          >
+            데이터 삭제
+          </button>
         </div>
       </div>
     </div>

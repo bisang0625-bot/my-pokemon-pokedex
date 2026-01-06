@@ -9,7 +9,7 @@
  */
 export function saveCardToPokedex(imageUrl, analysisResult) {
   const savedCards = JSON.parse(localStorage.getItem('pokedexCards') || '[]')
-  
+
   const newCard = {
     id: Date.now().toString(),
     image: imageUrl,
@@ -24,10 +24,10 @@ export function saveCardToPokedex(imageUrl, analysisResult) {
     nickname: analysisResult.nickname || '',
     scannedAt: new Date().toISOString()
   }
-  
+
   savedCards.push(newCard)
   localStorage.setItem('pokedexCards', JSON.stringify(savedCards))
-  
+
   return newCard
 }
 
@@ -44,9 +44,26 @@ export function getCardsFromPokedex() {
  * @param {string} cardId - 삭제할 카드 ID
  */
 export function deleteCardFromPokedex(cardId) {
+  console.log('[Utils] deleteCardFromPokedex called with:', cardId);
   const savedCards = JSON.parse(localStorage.getItem('pokedexCards') || '[]')
-  const updatedCards = savedCards.filter(card => card.id !== cardId)
-  localStorage.setItem('pokedexCards', JSON.stringify(updatedCards))
+
+  console.log('[Utils] Current IDs in storage:', savedCards.map(c => c.id));
+
+  const updatedCards = savedCards.filter(card => {
+    const isMatch = String(card.id) === String(cardId);
+    if (isMatch) console.log('[Utils] Found match for deletion:', card.name, card.id);
+    return !isMatch;
+  });
+
+  console.log('[Utils] IDs after filter:', updatedCards.map(c => c.id));
+
+  if (savedCards.length === updatedCards.length) {
+    console.warn('[Utils] No cards were removed! Check ID types.');
+  } else {
+    console.log('[Utils] Saving updated list to localStorage');
+    localStorage.setItem('pokedexCards', JSON.stringify(updatedCards))
+  }
+
   return updatedCards
 }
 

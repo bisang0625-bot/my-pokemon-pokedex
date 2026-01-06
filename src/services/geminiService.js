@@ -5,8 +5,8 @@ const genAI = new GoogleGenerativeAI(API_KEY);
 
 export async function analyzeCard(imageBlob) {
   try {
-    // gemini-2.5-flash-lite 모델을 사용합니다.
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
+    // gemini-flash-latest 모델을 사용합니다. (가장 안정적인 최신 버전 별칭 사용)
+    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
     const base64Data = await blobToBase64(imageBlob);
 

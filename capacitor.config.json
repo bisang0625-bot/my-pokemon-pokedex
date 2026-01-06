@@ -1,0 +1,33 @@
+{
+  "appId": "com.pokemonmaster.app",
+  "appName": "포켓 카드 헌터: 몬스터 키우기",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "launchAutoHide": true,
+      "backgroundColor": "#ef4444",
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": false,
+      "iosSpinnerStyle": "small",
+      "spinnerColor": "#ffffff",
+      "splashFullScreen": true,
+      "splashImmersive": true
+    },
+    "StatusBar": {
+      "style": "dark",
+      "backgroundColor": "#ef4444"
+    },
+    "Camera": {
+      "permissions": {
+        "camera": "카드 스캔을 위해 카메라 권한이 필요합니다.",
+        "photos": "카드 이미지를 저장하기 위해 사진 라이브러리 권한이 필요합니다."
+      }
+    }
+  }
+}
+
