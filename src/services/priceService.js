@@ -47,10 +47,22 @@ export function estimateCardPrice(card) {
   let basePrice = basePrices[card.rarity] || basePrices[1];
   const hpMultiplier = 1 + (card.hp || 0) / 500;
   const powerMultiplier = 1 + ((card.powerLevel || 50) / 200);
-  const estimatedPrice = Math.round(basePrice * hpMultiplier * powerMultiplier);
+  let estimatedPrice = Math.round(basePrice * hpMultiplier * powerMultiplier);
+  
+  // 비공식/위조 카드는 가치를 매우 낮게 산정 (10% 수준)
+  // _isOfficial는 내부 전용 필드로 UI에는 표시되지 않음
+  if (card._isOfficial === false) {
+    estimatedPrice = Math.round(estimatedPrice * 0.1);
+    // 최소 가치는 100원으로 유지 (너무 낮으면 이상함)
+    estimatedPrice = Math.max(estimatedPrice, 100);
+  }
+  
   return {
-    estimated: estimatedPrice, min: Math.round(estimatedPrice * 0.7), max: Math.round(estimatedPrice * 1.5),
-    currency: 'KRW', lastUpdated: new Date().toISOString()
+    estimated: estimatedPrice, 
+    min: Math.round(estimatedPrice * 0.7), 
+    max: Math.round(estimatedPrice * 1.5),
+    currency: 'KRW', 
+    lastUpdated: new Date().toISOString()
   };
 }
 

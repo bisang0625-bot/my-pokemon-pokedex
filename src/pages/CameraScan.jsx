@@ -62,11 +62,21 @@ export default function CameraScan() {
       const blob = await response.blob()
 
       const result = await analyzeCard(blob)
+      
+      // 추가 검증: 결과가 유효한지 확인
+      if (!result || !result.name || !result.hp || !result.type) {
+        throw new Error('포켓몬 카드 정보를 올바르게 읽을 수 없습니다. 카드를 명확하게 스캔해주세요.')
+      }
+      
       setAnalysisResult(result)
       saveCardToPokedex(capturedImage, result)
     } catch (err) {
-      setError(err.message || '카드 분석 중 오류가 발생했습니다.')
+      const errorMessage = err.message || '카드 분석 중 오류가 발생했습니다.'
+      setError(errorMessage)
       console.error('분석 오류:', err)
+      
+      // 포켓몬 카드가 아닌 경우, 분석 결과를 초기화하고 다시 찍을 수 있도록 함
+      setAnalysisResult(null)
     } finally {
       setIsAnalyzing(false)
     }
@@ -210,40 +220,60 @@ export default function CameraScan() {
           )}
         </div>
       ) : (
-        <div className="space-y-6">
-          <div className="relative rounded-2xl overflow-hidden shadow-lg border-4 border-white max-w-sm mx-auto">
-            <img
-              src={capturedImage}
-              alt="촬영된 카드"
-              className="w-full h-auto"
-            />
-            <div className="absolute inset-0 ring-4 ring-black/10 rounded-2xl pointer-events-none"></div>
+        <div className="flex flex-col min-h-[calc(100vh-200px)] sm:min-h-auto">
+          {/* 이미지 섹션 - 모바일에서 높이 제한 */}
+          <div className="flex-shrink-0 mb-4 sm:mb-6">
+            <div className="relative rounded-2xl overflow-hidden shadow-lg border-4 border-white max-w-sm mx-auto max-h-[40vh] sm:max-h-none">
+              <img
+                src={capturedImage}
+                alt="촬영된 카드"
+                className="w-full h-auto object-contain"
+              />
+              <div className="absolute inset-0 ring-4 ring-black/10 rounded-2xl pointer-events-none"></div>
+            </div>
           </div>
 
-          {isAnalyzing ? (
-            <div className="bg-white rounded-2xl p-8 text-center shadow-lg border-2 border-pokemon-yellow animate-pulse">
-              <div className="text-4xl mb-4 animate-spin-slow inline-block">⏳</div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">포켓몬 분석 중...</h3>
-              <p className="text-gray-500">도감을 펼치고 있어요!</p>
-            </div>
-          ) : (
-            !analysisResult && (
-              <div className="flex flex-col gap-3 max-w-sm mx-auto">
-                <button
-                  onClick={analyzeImage}
-                  className="w-full py-4 bg-gradient-to-r from-pokemon-blue to-blue-600 text-white rounded-2xl font-black text-xl shadow-lg hover:scale-105 transition-transform flex items-center justify-center gap-2"
-                >
-                  <span className="text-2xl">✨</span> 분석하기
-                </button>
-                <button
-                  onClick={resetScan}
-                  className="w-full py-3 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200"
-                >
-                  다시 찍기
-                </button>
+          {/* 버튼 섹션 - 항상 보이도록 */}
+          <div className="flex-1 flex flex-col justify-start">
+            {isAnalyzing ? (
+              <div className="bg-white rounded-2xl p-6 sm:p-8 text-center shadow-lg border-2 border-pokemon-yellow animate-pulse">
+                <div className="text-4xl mb-4 animate-spin-slow inline-block">⏳</div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">포켓몬 분석 중...</h3>
+                <p className="text-gray-500">도감을 펼치고 있어요!</p>
               </div>
-            )
-          )}
+            ) : (
+              !analysisResult && (
+                <div className="flex flex-col gap-3 max-w-sm mx-auto w-full px-4 sm:px-0">
+                  {error && (
+                    <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 mb-2">
+                      <div className="flex items-start gap-2">
+                        <span className="text-2xl">⚠️</span>
+                        <div className="flex-1">
+                          <h4 className="font-bold text-red-700 mb-1">분석 실패</h4>
+                          <p className="text-sm text-red-600">{error}</p>
+                          <p className="text-xs text-red-500 mt-2">
+                            💡 포켓몬 카드를 명확하게 스캔해주세요!
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <button
+                    onClick={analyzeImage}
+                    className="w-full py-4 bg-gradient-to-r from-pokemon-blue to-blue-600 text-white rounded-2xl font-black text-xl shadow-lg hover:scale-105 transition-transform flex items-center justify-center gap-2"
+                  >
+                    <span className="text-2xl">✨</span> 분석하기
+                  </button>
+                  <button
+                    onClick={resetScan}
+                    className="w-full py-3 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200"
+                  >
+                    다시 찍기
+                  </button>
+                </div>
+              )
+            )}
+          </div>
 
           {analysisResult && (
             <div className="mt-6 bg-white rounded-3xl shadow-2xl overflow-hidden border-4 border-pokemon-yellow relative max-w-md mx-auto transform transition-all animate-pop">

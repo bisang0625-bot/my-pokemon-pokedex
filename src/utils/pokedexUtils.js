@@ -22,7 +22,9 @@ export function saveCardToPokedex(imageUrl, analysisResult) {
     strongAgainst: analysisResult.strongAgainst || '',
     weakAgainst: analysisResult.weakAgainst || '',
     nickname: analysisResult.nickname || '',
-    scannedAt: new Date().toISOString()
+    scannedAt: new Date().toISOString(),
+    // _isOfficial: 내부 전용 필드 (위조/비공식 카드 여부, UI에는 표시 안 함)
+    _isOfficial: analysisResult._isOfficial !== false // 기본값은 true
   }
 
   savedCards.push(newCard)
