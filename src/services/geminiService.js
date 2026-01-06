@@ -1,10 +1,24 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const genAI = new GoogleGenerativeAI(API_KEY);
+
+// API_KEY가 없으면 에러 방지를 위해 초기화하지 않음
+let genAI = null;
+if (API_KEY) {
+  try {
+    genAI = new GoogleGenerativeAI(API_KEY);
+  } catch (error) {
+    console.error('Gemini AI 초기화 오류:', error);
+  }
+}
 
 export async function analyzeCard(imageBlob) {
   try {
+    // API_KEY 확인
+    if (!API_KEY || !genAI) {
+      throw new Error('API 키가 설정되지 않았습니다. 부모 모드에서 API 키를 설정해주세요.');
+    }
+    
     // gemini-flash-latest 모델을 사용합니다. (가장 안정적인 최신 버전 별칭 사용)
     const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 

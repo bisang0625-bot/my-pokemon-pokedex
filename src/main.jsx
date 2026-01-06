@@ -36,7 +36,17 @@ if ('serviceWorker' in navigator) {
 
 // React 앱 렌더링 - Service Worker와 독립적으로 실행
 const rootElement = document.getElementById('root');
-if (rootElement) {
+if (!rootElement) {
+  console.error('Root element not found');
+  // body에 에러 메시지 표시
+  document.body.innerHTML = `
+    <div style="padding: 40px; text-align: center; font-family: system-ui; color: #333;">
+      <h1 style="color: #ef4444;">앱 로드 오류</h1>
+      <p>root 요소를 찾을 수 없습니다.</p>
+      <p style="color: #666; font-size: 14px;">페이지를 새로고침해주세요.</p>
+    </div>
+  `;
+} else {
   try {
     ReactDOM.createRoot(rootElement).render(
       <React.StrictMode>
@@ -47,15 +57,16 @@ if (rootElement) {
     console.error('React rendering error:', error);
     // 에러 발생 시 사용자에게 알림
     rootElement.innerHTML = `
-      <div style="padding: 20px; text-align: center; font-family: system-ui;">
-        <h1>앱 로드 오류</h1>
-        <p>브라우저를 새로고침해주세요.</p>
-        <p style="color: #666; font-size: 12px;">${error.message}</p>
+      <div style="padding: 40px; text-align: center; font-family: system-ui; background: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <h1 style="color: #ef4444; margin-bottom: 20px;">앱 로드 오류</h1>
+        <p style="color: #333; margin-bottom: 10px;">브라우저를 새로고침해주세요.</p>
+        <p style="color: #666; font-size: 12px; margin-top: 10px;">${error.message || '알 수 없는 오류'}</p>
+        <button onclick="window.location.reload()" style="margin-top: 20px; padding: 10px 20px; background: #ef4444; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
+          새로고침
+        </button>
       </div>
     `;
   }
-} else {
-  console.error('Root element not found');
 }
 
 

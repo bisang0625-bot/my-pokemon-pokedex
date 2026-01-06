@@ -1,10 +1,28 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const genAI = new GoogleGenerativeAI(API_KEY);
+
+// API_KEY가 없으면 에러 방지를 위해 초기화하지 않음
+let genAI = null;
+if (API_KEY) {
+  try {
+    genAI = new GoogleGenerativeAI(API_KEY);
+  } catch (error) {
+    console.error('Gemini AI 초기화 오류:', error);
+  }
+}
 
 export async function getRealCardPrice(card) {
   try {
+    // API_KEY 확인
+    if (!API_KEY || !genAI) {
+      return {
+        ...estimateCardPrice(card),
+        isRealPrice: false,
+        error: 'API 키가 설정되지 않았습니다.'
+      };
+    }
+    
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
     const prompt = `포켓몬 카드 시세 정보를 제공해주세요. 
