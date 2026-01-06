@@ -34,30 +34,44 @@ export default function Pokedex() {
 
   // 타입을 영어 코드로 정규화하는 함수 (먼저 정의)
   const normalizeType = (type) => {
-    if (!type) return 'normal';
-    
-    const koreanToEnglish = {
-      '불꽃': 'fire', '물': 'water', '풀': 'grass', '전기': 'electric',
-      '에스퍼': 'psychic', '얼음': 'ice', '드래곤': 'dragon', '악': 'dark',
-      '페어리': 'fairy', '노말': 'normal', '격투': 'fighting'
-    };
-    
-    // 한국어 타입이면 영어로 변환
-    if (koreanToEnglish[type]) {
-      return koreanToEnglish[type];
+    if (!type) {
+      console.warn('normalizeType: 타입이 없음');
+      return 'normal';
     }
     
-    // 이미 영어 코드인 경우
-    const lowerType = String(type).toLowerCase();
-    if (['fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy', 'normal', 'fighting'].includes(lowerType)) {
+    // 문자열로 변환
+    const typeStr = String(type).trim();
+    
+    const koreanToEnglish = {
+      '불꽃': 'fire', 
+      '물': 'water', 
+      '풀': 'grass', 
+      '전기': 'electric',
+      '에스퍼': 'psychic', 
+      '얼음': 'ice', 
+      '드래곤': 'dragon', 
+      '악': 'dark',
+      '페어리': 'fairy', 
+      '노말': 'normal', 
+      '격투': 'fighting'
+    };
+    
+    // 한국어 타입이면 영어로 변환 (정확한 매칭)
+    if (koreanToEnglish.hasOwnProperty(typeStr)) {
+      const result = koreanToEnglish[typeStr];
+      console.log('한국어 타입 변환:', typeStr, '->', result);
+      return result;
+    }
+    
+    // 이미 영어 코드인 경우 (소문자 변환)
+    const lowerType = typeStr.toLowerCase();
+    const validTypes = ['fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy', 'normal', 'fighting'];
+    if (validTypes.includes(lowerType)) {
       return lowerType;
     }
     
     // 디버깅: 알 수 없는 타입 로그
-    if (type !== 'normal') {
-      console.warn('알 수 없는 타입:', type, '기본값 normal 반환');
-    }
-    
+    console.warn('알 수 없는 타입:', type, '(원본:', typeStr, ') - 기본값 normal 반환');
     return 'normal';
   }
 
@@ -85,7 +99,9 @@ export default function Pokedex() {
       if (selectedType !== 'all') {
         filtered = filtered.filter(card => {
           try {
-            return normalizeType(card?.type) === selectedType
+            // type 또는 typeKorean 확인
+            const cardType = card?.type || card?.typeKorean || '';
+            return normalizeType(cardType) === selectedType
           } catch {
             return false
           }
