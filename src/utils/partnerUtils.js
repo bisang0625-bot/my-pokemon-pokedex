@@ -82,8 +82,8 @@ export function calculateXP(cards) {
         return total + cardTotalXP;
     }, 0);
 
-    // 레벨업을 지금보다 3배 느리게: 누적 XP를 1/3로 축소
-    return Math.floor(totalXp / 3);
+    // 레벨업을 지금보다 10배 느리게: 누적 XP를 1/10로 축소
+    return Math.floor(totalXp / 10);
 }
 
 /**
