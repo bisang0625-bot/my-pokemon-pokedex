@@ -84,10 +84,9 @@
 - **앱 타입**: 웹앱 (WebView)
 
 #### 웹 URL 등록
-- **웹 URL**: (Vercel 배포 주소 입력)
-  - 예: `https://your-app.vercel.app`
-- ✅ HTTPS 필수
-- ✅ 앱이 정상 작동하는지 먼저 확인
+- **웹 URL**: `https://my-pokemon-pokedex-seven.vercel.app/`
+  - ✅ HTTPS 적용됨
+  - ✅ 앱이 정상 작동하는지 확인 완료
 
 #### 최소 정보 입력 (테스트용)
 - 앱 이름: ✅
