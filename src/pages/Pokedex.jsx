@@ -42,6 +42,11 @@ export default function Pokedex() {
     // 문자열로 변환
     const typeStr = String(type).trim();
     
+    // 'all'은 특별 처리 (필터용)
+    if (typeStr.toLowerCase() === 'all') {
+      return 'all';
+    }
+    
     const koreanToEnglish = {
       '노말': 'normal',
       '불꽃': 'fire', 
@@ -286,6 +291,10 @@ export default function Pokedex() {
 
   // 타입 아이콘 (한국어/영어 모두 처리) - 모든 타입 지원
   const getTypeIcon = (type) => {
+    // 'all'은 직접 처리 (normalizeType 호출 전)
+    if (String(type).toLowerCase() === 'all') {
+      return '🌈';
+    }
     const englishType = normalizeType(type);
     const icons = {
       normal: '⚪', fire: '🔥', water: '💧', electric: '⚡',
@@ -299,6 +308,10 @@ export default function Pokedex() {
 
   // 타입 색상 (한국어/영어 모두 처리) - 모든 타입 지원
   const getTypeColor = (type) => {
+    // 'all'은 직접 처리 (normalizeType 호출 전)
+    if (String(type).toLowerCase() === 'all') {
+      return 'bg-gray-800';
+    }
     const englishType = normalizeType(type);
     const colors = {
       normal: 'bg-gray-400', fire: 'bg-red-500', water: 'bg-blue-500', 
@@ -312,6 +325,10 @@ export default function Pokedex() {
   }
 
   const getTypeLabel = (type) => {
+    // 'all'은 직접 처리 (normalizeType 호출 전)
+    if (String(type).toLowerCase() === 'all') {
+      return '전체';
+    }
     // normalizeType 함수 사용
     const englishType = normalizeType(type);
     
