@@ -48,7 +48,7 @@ import { estimateCardPrice } from '../services/priceService';
 export function calculateXP(cards) {
     if (!cards || cards.length === 0) return 0;
 
-    return cards.reduce((total, card) => {
+    const totalXp = cards.reduce((total, card) => {
         // 기본 XP: 희귀도에 따른 기본값 (희귀할수록 높음)
         // 1성: 20, 2성: 50, 3성: 100, 4성: 250, 5성: 500
         const baseRarityXP = {
@@ -81,6 +81,9 @@ export function calculateXP(cards) {
         
         return total + cardTotalXP;
     }, 0);
+
+    // 레벨업을 지금보다 3배 느리게: 누적 XP를 1/3로 축소
+    return Math.floor(totalXp / 3);
 }
 
 /**
