@@ -43,30 +43,36 @@ export default function Pokedex() {
     const typeStr = String(type).trim();
     
     const koreanToEnglish = {
+      '노말': 'normal',
       '불꽃': 'fire', 
       '물': 'water', 
-      '풀': 'grass', 
       '전기': 'electric',
-      '에스퍼': 'psychic', 
-      '얼음': 'ice', 
-      '드래곤': 'dragon', 
+      '풀': 'grass',
+      '얼음': 'ice',
+      '격투': 'fighting',
+      '독': 'poison',
+      '땅': 'ground',
+      '비행': 'flying',
+      '에스퍼': 'psychic',
+      '벌레': 'bug',
+      '바위': 'rock',
+      '고스트': 'ghost',
+      '드래곤': 'dragon',
       '악': 'dark',
-      '페어리': 'fairy', 
-      '노말': 'normal', 
-      '격투': 'fighting'
+      '강철': 'steel',
+      '페어리': 'fairy'
     };
     
     // 한국어 타입이면 영어로 변환 (정확한 매칭)
     if (koreanToEnglish.hasOwnProperty(typeStr)) {
       const result = koreanToEnglish[typeStr];
-      console.log('한국어 타입 변환:', typeStr, '->', result);
       return result;
     }
     
-    // 이미 영어 코드인 경우 (소문자 변환)
+    // 이미 영어 코드인 경우 (소문자 변환) - 모든 포켓몬 타입 지원
     const lowerType = typeStr.toLowerCase();
-    const validTypes = ['fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy', 'normal', 'fighting'];
-    if (validTypes.includes(lowerType)) {
+    const allTypes = ['normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy'];
+    if (allTypes.includes(lowerType)) {
       return lowerType;
     }
     
@@ -221,44 +227,39 @@ export default function Pokedex() {
     }
   }
 
-  // 타입별 카드 수 (한국어/영어 모두 처리, 에러 방지)
+  // 타입별 카드 수 (한국어/영어 모두 처리, 에러 방지) - 모든 타입 지원
   const typeCounts = useMemo(() => {
     try {
+      const allTypes = ['normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy'];
+      
       if (!cards || !Array.isArray(cards)) {
-        return { all: 0, fire: 0, water: 0, grass: 0, electric: 0 }
+        const emptyCounts = { all: 0 };
+        allTypes.forEach(type => { emptyCounts[type] = 0; });
+        return emptyCounts;
       }
       
-      // 디버깅: 카드 타입 확인
-      console.log('타입별 카드 수 계산 - 전체 카드:', cards.length);
-      cards.forEach(card => {
-        console.log('카드:', card.name, '타입:', card.type, '정규화된 타입:', normalizeType(card?.type));
-      });
-      
-      const counts = {
-        all: cards.length,
-        fire: 0,
-        water: 0,
-        grass: 0,
-        electric: 0
-      };
+      const counts = { all: cards.length };
+      allTypes.forEach(type => { counts[type] = 0; });
       
       cards.forEach(card => {
         try {
-          const normalizedType = normalizeType(card?.type);
-          if (normalizedType === 'fire') counts.fire++;
-          else if (normalizedType === 'water') counts.water++;
-          else if (normalizedType === 'grass') counts.grass++;
-          else if (normalizedType === 'electric') counts.electric++;
+          const cardType = card?.type || card?.typeKorean || '';
+          const normalizedType = normalizeType(cardType);
+          if (allTypes.includes(normalizedType)) {
+            counts[normalizedType]++;
+          }
         } catch (err) {
           console.warn('카드 타입 정규화 에러:', card?.name, card?.type, err);
         }
       });
       
-      console.log('계산된 타입별 카드 수:', counts);
       return counts;
     } catch (error) {
       console.error('타입별 카드 수 계산 에러:', error)
-      return { all: 0, fire: 0, water: 0, grass: 0, electric: 0 }
+      const emptyCounts = { all: 0 };
+      const allTypes = ['normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy'];
+      allTypes.forEach(type => { emptyCounts[type] = 0; });
+      return emptyCounts;
     }
   }, [cards])
 
@@ -283,25 +284,29 @@ export default function Pokedex() {
     }
   }, [cards])
 
-  // 타입 아이콘 (한국어/영어 모두 처리)
+  // 타입 아이콘 (한국어/영어 모두 처리) - 모든 타입 지원
   const getTypeIcon = (type) => {
     const englishType = normalizeType(type);
     const icons = {
-      fire: '🔥', water: '💧', grass: '🌿', electric: '⚡',
-      psychic: '🔮', ice: '❄️', dragon: '🐉', dark: '🌑',
-      fairy: '✨', normal: '⚪', fighting: '🥊',
-      all: '🌈'
+      normal: '⚪', fire: '🔥', water: '💧', electric: '⚡',
+      grass: '🌿', ice: '❄️', fighting: '🥊', poison: '☠️',
+      ground: '⛰️', flying: '🕊️', psychic: '🔮', bug: '🐛',
+      rock: '🪨', ghost: '👻', dragon: '🐉', dark: '🌑',
+      steel: '⚙️', fairy: '✨', all: '🌈'
     }
     return icons[englishType] || '✨'
   }
 
-  // 타입 색상 (한국어/영어 모두 처리)
+  // 타입 색상 (한국어/영어 모두 처리) - 모든 타입 지원
   const getTypeColor = (type) => {
     const englishType = normalizeType(type);
     const colors = {
-      fire: 'bg-red-500', water: 'bg-blue-500', grass: 'bg-green-500', electric: 'bg-yellow-400',
-      psychic: 'bg-pink-500', ice: 'bg-cyan-300', dragon: 'bg-purple-600', dark: 'bg-gray-700',
-      fairy: 'bg-pink-300', normal: 'bg-gray-400', fighting: 'bg-red-700',
+      normal: 'bg-gray-400', fire: 'bg-red-500', water: 'bg-blue-500', 
+      electric: 'bg-yellow-400', grass: 'bg-green-500', ice: 'bg-cyan-300',
+      fighting: 'bg-red-700', poison: 'bg-purple-500', ground: 'bg-yellow-700',
+      flying: 'bg-indigo-300', psychic: 'bg-pink-500', bug: 'bg-green-600',
+      rock: 'bg-yellow-800', ghost: 'bg-purple-700', dragon: 'bg-purple-600',
+      dark: 'bg-gray-700', steel: 'bg-gray-500', fairy: 'bg-pink-300'
     }
     return colors[englishType] || 'bg-gray-500'
   }
@@ -311,10 +316,11 @@ export default function Pokedex() {
     const englishType = normalizeType(type);
     
     const labels = {
-      fire: '불꽃', water: '물', grass: '풀', electric: '전기',
-      psychic: '에스퍼', ice: '얼음', dragon: '드래곤', dark: '악',
-      fairy: '페어리', normal: '노말', fighting: '격투',
-      all: '전체'
+      normal: '노말', fire: '불꽃', water: '물', electric: '전기',
+      grass: '풀', ice: '얼음', fighting: '격투', poison: '독',
+      ground: '땅', flying: '비행', psychic: '에스퍼', bug: '벌레',
+      rock: '바위', ghost: '고스트', dragon: '드래곤', dark: '악',
+      steel: '강철', fairy: '페어리', all: '전체'
     }
     return labels[englishType] || type
   }
@@ -483,7 +489,7 @@ export default function Pokedex() {
           <div>
             <div className="text-xs font-bold text-gray-500 mb-2 px-1">타입별</div>
             <div className="flex overflow-x-auto pb-2 gap-2 no-scrollbar">
-              {['all', 'fire', 'water', 'grass', 'electric'].map((type) => (
+              {['all', 'normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy'].map((type) => (
                 <button
                   key={type}
                   onClick={() => setSelectedType(type)}

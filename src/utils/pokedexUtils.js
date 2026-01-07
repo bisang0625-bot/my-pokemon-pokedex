@@ -36,9 +36,10 @@ function convertTypeToEnglish(koreanType) {
     return typeMap[koreanType];
   }
   
-  // 소문자로 변환 후 확인
+  // 소문자로 변환 후 확인 (모든 포켓몬 타입)
   const lowerType = koreanType.toLowerCase();
-  if (['fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy', 'normal', 'fighting'].includes(lowerType)) {
+  const allTypes = ['normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy'];
+  if (allTypes.includes(lowerType)) {
     return lowerType;
   }
   

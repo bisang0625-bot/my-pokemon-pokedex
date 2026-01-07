@@ -89,14 +89,16 @@ export default function CameraScan() {
     setIsScanning(false)
   }
 
-  // 타입을 영어 코드로 정규화하는 함수 (한국어/영어 모두 처리)
+  // 타입을 영어 코드로 정규화하는 함수 (한국어/영어 모두 처리) - 모든 타입 지원
   const normalizeType = (type) => {
     if (!type) return 'normal';
     
     const koreanToEnglish = {
-      '불꽃': 'fire', '물': 'water', '풀': 'grass', '전기': 'electric',
-      '에스퍼': 'psychic', '얼음': 'ice', '드래곤': 'dragon', '악': 'dark',
-      '페어리': 'fairy', '노말': 'normal', '격투': 'fighting'
+      '노말': 'normal', '불꽃': 'fire', '물': 'water', '전기': 'electric',
+      '풀': 'grass', '얼음': 'ice', '격투': 'fighting', '독': 'poison',
+      '땅': 'ground', '비행': 'flying', '에스퍼': 'psychic', '벌레': 'bug',
+      '바위': 'rock', '고스트': 'ghost', '드래곤': 'dragon', '악': 'dark',
+      '강철': 'steel', '페어리': 'fairy'
     };
     
     // 한국어 타입이면 영어로 변환
@@ -104,9 +106,11 @@ export default function CameraScan() {
       return koreanToEnglish[type];
     }
     
-    // 이미 영어 코드인 경우
-    if (['fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy', 'normal', 'fighting'].includes(type.toLowerCase())) {
-      return type.toLowerCase();
+    // 이미 영어 코드인 경우 - 모든 포켓몬 타입 지원
+    const lowerType = type.toLowerCase();
+    const allTypes = ['normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy'];
+    if (allTypes.includes(lowerType)) {
+      return lowerType;
     }
     
     return 'normal';
@@ -115,9 +119,11 @@ export default function CameraScan() {
   const getTypeLabel = (type) => {
     const englishType = normalizeType(type);
     const typeMap = {
-      fire: '불꽃', water: '물', grass: '풀', electric: '전기',
-      psychic: '에스퍼', ice: '얼음', dragon: '드래곤', dark: '악',
-      fairy: '페어리', normal: '노말', fighting: '격투'
+      normal: '노말', fire: '불꽃', water: '물', electric: '전기',
+      grass: '풀', ice: '얼음', fighting: '격투', poison: '독',
+      ground: '땅', flying: '비행', psychic: '에스퍼', bug: '벌레',
+      rock: '바위', ghost: '고스트', dragon: '드래곤', dark: '악',
+      steel: '강철', fairy: '페어리'
     }
     return typeMap[englishType] || type
   }
@@ -125,9 +131,12 @@ export default function CameraScan() {
   const getTypeColor = (type) => {
     const englishType = normalizeType(type);
     const colorMap = {
-      fire: 'bg-red-500', water: 'bg-blue-500', grass: 'bg-green-500', electric: 'bg-yellow-400',
-      psychic: 'bg-pink-500', ice: 'bg-cyan-300', dragon: 'bg-purple-600', dark: 'bg-gray-700',
-      fairy: 'bg-pink-300', normal: 'bg-gray-400', fighting: 'bg-red-700'
+      normal: 'bg-gray-400', fire: 'bg-red-500', water: 'bg-blue-500', 
+      electric: 'bg-yellow-400', grass: 'bg-green-500', ice: 'bg-cyan-300',
+      fighting: 'bg-red-700', poison: 'bg-purple-500', ground: 'bg-yellow-700',
+      flying: 'bg-indigo-300', psychic: 'bg-pink-500', bug: 'bg-green-600',
+      rock: 'bg-yellow-800', ghost: 'bg-purple-700', dragon: 'bg-purple-600',
+      dark: 'bg-gray-700', steel: 'bg-gray-500', fairy: 'bg-pink-300'
     }
     return colorMap[englishType] || 'bg-gray-500'
   }
@@ -135,9 +144,11 @@ export default function CameraScan() {
   const getTypeIcon = (type) => {
     const englishType = normalizeType(type);
     const iconMap = {
-      fire: '🔥', water: '💧', grass: '🌿', electric: '⚡',
-      psychic: '🔮', ice: '❄️', dragon: '🐉', dark: '🌑',
-      fairy: '✨', normal: '⚪', fighting: '🥊'
+      normal: '⚪', fire: '🔥', water: '💧', electric: '⚡',
+      grass: '🌿', ice: '❄️', fighting: '🥊', poison: '☠️',
+      ground: '⛰️', flying: '🕊️', psychic: '🔮', bug: '🐛',
+      rock: '🪨', ghost: '👻', dragon: '🐉', dark: '🌑',
+      steel: '⚙️', fairy: '✨'
     }
     return iconMap[englishType] || '✨'
   }
