@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import { getCardsFromPokedex } from '../utils/pokedexUtils'
 import { calculateTotalValue, estimateCardPrice, formatPrice, getRealCardPrice } from '../services/priceService'
 import ParentalGate from '../components/ParentalGate'
+import { useLanguage } from '../contexts/LanguageContext'
 
 export default function ParentMode() {
+  const { translate, language } = useLanguage()
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [stats, setStats] = useState({
     totalCards: 0,
@@ -72,12 +74,12 @@ export default function ParentMode() {
   }
 
   const clearAllData = () => {
-    if (confirm('모든 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+    if (confirm(translate('parentMode.deleteConfirm'))) {
       localStorage.removeItem('pokedexCards')
       setStats({ totalCards: 0, lastScanDate: null })
       setCardPrices([])
       setTotalValue(null)
-      alert('모든 데이터가 삭제되었습니다.')
+      alert(translate('parentMode.deleteSuccess'))
     }
   }
 
@@ -90,11 +92,11 @@ export default function ParentMode() {
       <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-10 border-4 border-pokemon-blue/10 animate-fade-in-up">
         <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
           <h2 className="text-3xl font-black text-pokemon-dark font-display flex items-center gap-3">
-            <span className="text-4xl">👨‍👩‍👧</span> 부모님 설정
+            <span className="text-4xl">👨‍👩‍👧</span> {translate('parentMode.title')}
           </h2>
           <span className="text-sm font-bold text-green-600 bg-green-100 px-4 py-2 rounded-full border border-green-200 shadow-sm flex items-center gap-2">
             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-            보안 연결됨
+            {translate('parentMode.secureConnection')}
           </span>
         </div>
 
@@ -102,16 +104,16 @@ export default function ParentMode() {
           {/* 통계 카드 */}
           <div className="bg-blue-50 rounded-2xl p-6 border-2 border-blue-100 shadow-sm hover:shadow-md transition-shadow">
             <h3 className="text-lg font-bold text-blue-800 mb-4 flex items-center gap-2">
-              📊 수집 현황
+              📊 {translate('parentMode.collectionStatus')}
             </h3>
             <div className="flex justify-between items-center mb-2">
-              <span className="text-gray-600">총 수집 카드</span>
-              <span className="text-3xl font-black text-blue-600">{stats.totalCards}장</span>
+              <span className="text-gray-600">{translate('parentMode.totalCollectedCards')}</span>
+              <span className="text-3xl font-black text-blue-600">{stats.totalCards}{translate('common.cards')}</span>
             </div>
             <div className="flex justify-between items-center border-t border-blue-200 pt-3">
-              <span className="text-sm text-gray-500">마지막 활동</span>
+              <span className="text-sm text-gray-500">{translate('parentMode.lastActivity')}</span>
               <span className="text-sm font-bold text-blue-700">
-                {stats.lastScanDate ? new Date(stats.lastScanDate).toLocaleDateString('ko-KR') : '-'}
+                {stats.lastScanDate ? new Date(stats.lastScanDate).toLocaleDateString(language === 'ko' ? 'ko-KR' : language === 'nl' ? 'nl-NL' : 'en-US') : '-'}
               </span>
             </div>
           </div>
@@ -119,24 +121,24 @@ export default function ParentMode() {
           {/* 가치 카드 */}
           <div className="bg-green-50 rounded-2xl p-6 border-2 border-green-100 shadow-sm hover:shadow-md transition-shadow">
             <h3 className="text-lg font-bold text-green-800 mb-4 flex items-center gap-2">
-              💰 가치 분석
+              💰 {translate('parentMode.valueAnalysis')}
             </h3>
             {isLoadingPrices ? (
               <div className="flex items-center gap-2 text-green-600 font-bold animate-pulse">
-                <span className="text-2xl">⏳</span> 계산 중...
+                <span className="text-2xl">⏳</span> {translate('parentMode.calculating')}
               </div>
             ) : (
               <>
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-gray-600">총 추정 가치</span>
+                  <span className="text-gray-600">{translate('parentMode.totalEstimatedValue')}</span>
                   <span className="text-3xl font-black text-green-600 tracking-tight">
-                    {totalValue ? formatPrice(totalValue.totalEstimated) : '0원'}
+                    {totalValue ? formatPrice(totalValue.totalEstimated) : formatPrice(0)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center border-t border-green-200 pt-3">
-                  <span className="text-sm text-gray-500">평균 단가</span>
+                  <span className="text-sm text-gray-500">{translate('parentMode.averagePrice')}</span>
                   <span className="text-sm font-bold text-green-700">
-                    {totalValue ? formatPrice(totalValue.averagePrice) : '0원'}
+                    {totalValue ? formatPrice(totalValue.averagePrice) : formatPrice(0)}
                   </span>
                 </div>
               </>
@@ -147,17 +149,17 @@ export default function ParentMode() {
         {/* 상세 목록 */}
         {cardPrices.length > 0 && (
           <div className="mb-8">
-            <h3 className="text-xl font-bold text-gray-700 mb-4 px-2">📋 보유 카드 목록</h3>
+            <h3 className="text-xl font-bold text-gray-700 mb-4 px-2">📋 {translate('parentMode.cardList')}</h3>
             <div className="bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden max-h-[500px] overflow-y-auto custom-scrollbar">
               {isLoadingPrices ? (
-                <div className="p-8 text-center text-gray-500">데이터를 불러오는 중입니다...</div>
+                <div className="p-8 text-center text-gray-500">{translate('parentMode.loading')}</div>
               ) : (
                 <table className="w-full text-left">
                   <thead className="bg-gray-100 sticky top-0 z-10 border-b border-gray-200">
                     <tr>
-                      <th className="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">몬스터</th>
-                      <th className="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">추정 가치</th>
-                      <th className="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right text-xs sm:text-sm hidden sm:table-cell">범위</th>
+                      <th className="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">{translate('parentMode.monster')}</th>
+                      <th className="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">{translate('parentMode.estimatedValue')}</th>
+                      <th className="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right text-xs sm:text-sm hidden sm:table-cell">{translate('parentMode.range')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -172,7 +174,7 @@ export default function ParentMode() {
                           <div>
                             <p className="font-bold text-gray-800">{card.name}</p>
                             <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-600 font-bold">
-                              {card.price?.isRealPrice ? 'AI 분석' : '추정'}
+                              {card.price?.isRealPrice ? translate('parentMode.aiAnalysis') : translate('parentMode.estimated')}
                             </span>
                           </div>
                         </td>
@@ -194,16 +196,16 @@ export default function ParentMode() {
         {/* 데이터 초기화 */}
         <div className="bg-red-50 p-6 rounded-2xl border border-red-100 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <h3 className="text-lg font-bold text-red-700 mb-1">⚠️ 데이터 초기화</h3>
+            <h3 className="text-lg font-bold text-red-700 mb-1">⚠️ {translate('parentMode.dataReset')}</h3>
             <p className="text-sm text-red-600/80">
-              아이의 카드 도감 데이터를 모두 삭제합니다.
+              {translate('parentMode.dataResetDescription')}
             </p>
           </div>
           <button
             onClick={clearAllData}
             className="px-6 py-3 bg-white border-2 border-red-200 text-red-600 rounded-xl hover:bg-red-50 hover:border-red-400 transition-all font-bold shadow-sm whitespace-nowrap"
           >
-            데이터 삭제
+            {translate('parentMode.deleteData')}
           </button>
         </div>
       </div>

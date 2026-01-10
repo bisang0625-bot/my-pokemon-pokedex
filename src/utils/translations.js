@@ -142,6 +142,59 @@ export const translations = {
       answerPlaceholder: '정답 입력',
       cancel: '취소',
       confirm: '확인'
+    },
+    
+    // ParentMode 페이지
+    parentMode: {
+      title: '부모님 설정',
+      secureConnection: '보안 연결됨',
+      collectionStatus: '수집 현황',
+      totalCollectedCards: '총 수집 카드',
+      lastActivity: '마지막 활동',
+      valueAnalysis: '가치 분석',
+      calculating: '계산 중...',
+      totalEstimatedValue: '총 추정 가치',
+      averagePrice: '평균 단가',
+      cardList: '보유 카드 목록',
+      loading: '데이터를 불러오는 중입니다...',
+      monster: '몬스터',
+      estimatedValue: '추정 가치',
+      range: '범위',
+      aiAnalysis: 'AI 분석',
+      estimated: '추정',
+      dataReset: '데이터 초기화',
+      dataResetDescription: '아이의 카드 도감 데이터를 모두 삭제합니다.',
+      deleteData: '데이터 삭제',
+      deleteConfirm: '모든 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.',
+      deleteSuccess: '모든 데이터가 삭제되었습니다.'
+    },
+    
+    // 파트너 포켓몬 이름
+    partners: {
+      fire: {
+        name: '이그니스',
+        stages: {
+          1: '이그니스',
+          2: '이그니스 워리어',
+          3: '이그니스 드래곤'
+        }
+      },
+      water: {
+        name: '아쿠아',
+        stages: {
+          1: '아쿠아',
+          2: '아쿠아 가디언',
+          3: '아쿠아 로드'
+        }
+      },
+      grass: {
+        name: '테라',
+        stages: {
+          1: '테라',
+          2: '테라 스피릿',
+          3: '테라 마스터'
+        }
+      }
     }
   },
   
@@ -276,6 +329,59 @@ export const translations = {
       answerPlaceholder: 'Enter answer',
       cancel: 'Cancel',
       confirm: 'Confirm'
+    },
+    
+    // ParentMode page
+    parentMode: {
+      title: 'Parent Settings',
+      secureConnection: 'Secure Connection',
+      collectionStatus: 'Collection Status',
+      totalCollectedCards: 'Total Collected Cards',
+      lastActivity: 'Last Activity',
+      valueAnalysis: 'Value Analysis',
+      calculating: 'Calculating...',
+      totalEstimatedValue: 'Total Estimated Value',
+      averagePrice: 'Average Unit Price',
+      cardList: 'Owned Card List',
+      loading: 'Loading data...',
+      monster: 'Monster',
+      estimatedValue: 'Estimated Value',
+      range: 'Range',
+      aiAnalysis: 'AI Analysis',
+      estimated: 'Estimated',
+      dataReset: 'Data Reset',
+      dataResetDescription: 'Deletes all of your child\'s card collection data.',
+      deleteData: 'Delete Data',
+      deleteConfirm: 'Are you sure you want to delete all data? This action cannot be undone.',
+      deleteSuccess: 'All data has been deleted.'
+    },
+    
+    // Partner monster names
+    partners: {
+      fire: {
+        name: 'Ignis',
+        stages: {
+          1: 'Ignis',
+          2: 'Ignis Warrior',
+          3: 'Ignis Dragon'
+        }
+      },
+      water: {
+        name: 'Aqua',
+        stages: {
+          1: 'Aqua',
+          2: 'Aqua Guardian',
+          3: 'Aqua Lord'
+        }
+      },
+      grass: {
+        name: 'Terra',
+        stages: {
+          1: 'Terra',
+          2: 'Terra Spirit',
+          3: 'Terra Master'
+        }
+      }
     }
   },
   
@@ -410,6 +516,59 @@ export const translations = {
       answerPlaceholder: 'Voer antwoord in',
       cancel: 'Annuleren',
       confirm: 'Bevestigen'
+    },
+    
+    // ParentMode page
+    parentMode: {
+      title: 'Ouder Instellingen',
+      secureConnection: 'Veilige Verbinding',
+      collectionStatus: 'Verzamelstatus',
+      totalCollectedCards: 'Totaal Verzamelde Kaarten',
+      lastActivity: 'Laatste Activiteit',
+      valueAnalysis: 'Waarde Analyse',
+      calculating: 'Berekenen...',
+      totalEstimatedValue: 'Totale Geschatte Waarde',
+      averagePrice: 'Gemiddelde Prijs',
+      cardList: 'Bezit Kaartenlijst',
+      loading: 'Gegevens laden...',
+      monster: 'Monster',
+      estimatedValue: 'Geschatte Waarde',
+      range: 'Bereik',
+      aiAnalysis: 'AI Analyse',
+      estimated: 'Geschat',
+      dataReset: 'Gegevens Resetten',
+      dataResetDescription: 'Verwijdert alle kaartverzamelgegevens van uw kind.',
+      deleteData: 'Gegevens Verwijderen',
+      deleteConfirm: 'Weet u zeker dat u alle gegevens wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.',
+      deleteSuccess: 'Alle gegevens zijn verwijderd.'
+    },
+    
+    // Partner monster names
+    partners: {
+      fire: {
+        name: 'Ignis',
+        stages: {
+          1: 'Ignis',
+          2: 'Ignis Krijger',
+          3: 'Ignis Draak'
+        }
+      },
+      water: {
+        name: 'Aqua',
+        stages: {
+          1: 'Aqua',
+          2: 'Aqua Wachter',
+          3: 'Aqua Heer'
+        }
+      },
+      grass: {
+        name: 'Terra',
+        stages: {
+          1: 'Terra',
+          2: 'Terra Geest',
+          3: 'Terra Meester'
+        }
+      }
     }
   }
 };

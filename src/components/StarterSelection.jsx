@@ -3,7 +3,10 @@ import { useLanguage } from '../contexts/LanguageContext'
 
 export default function StarterSelection({ onSelect }) {
     const { translate } = useLanguage()
-    const starters = [PARTNERS.fire, PARTNERS.water, PARTNERS.grass]
+    const starters = [PARTNERS.fire, PARTNERS.water, PARTNERS.grass].map(starter => ({
+      ...starter,
+      name: translate(`partners.${starter.id}.name`)
+    }))
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 pb-28 sm:pb-4 bg-black/80 backdrop-blur-sm">

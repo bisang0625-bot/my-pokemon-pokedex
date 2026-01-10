@@ -88,6 +88,31 @@ export default function Pokedex() {
     return 'normal';
   }
 
+  // 파트너 이름 번역 함수
+  const translatePartnerName = (partnerId, name) => {
+    if (!partnerId || !name) return name;
+    
+    // 한국어 이름을 번역 키로 변환
+    const nameMap = {
+      '이그니스': { key: 'partners.fire.stages.1', id: 'fire', stage: 1 },
+      '이그니스 워리어': { key: 'partners.fire.stages.2', id: 'fire', stage: 2 },
+      '이그니스 드래곤': { key: 'partners.fire.stages.3', id: 'fire', stage: 3 },
+      '아쿠아': { key: 'partners.water.stages.1', id: 'water', stage: 1 },
+      '아쿠아 가디언': { key: 'partners.water.stages.2', id: 'water', stage: 2 },
+      '아쿠아 로드': { key: 'partners.water.stages.3', id: 'water', stage: 3 },
+      '테라': { key: 'partners.grass.stages.1', id: 'grass', stage: 1 },
+      '테라 스피릿': { key: 'partners.grass.stages.2', id: 'grass', stage: 2 },
+      '테라 마스터': { key: 'partners.grass.stages.3', id: 'grass', stage: 3 }
+    };
+    
+    const mapping = nameMap[name];
+    if (mapping) {
+      return translate(mapping.key);
+    }
+    
+    return name;
+  }
+
   // 파트너 상태 계산 (에러 방지)
   let totalXP = 0;
   let partnerStatus = null;
@@ -95,6 +120,16 @@ export default function Pokedex() {
   try {
     totalXP = calculateXP(cards) || 0;
     partnerStatus = partnerId ? getPartnerStatus(partnerId, totalXP) : null;
+    
+    // 파트너 이름 번역 적용
+    if (partnerStatus) {
+      if (partnerStatus.stage?.name) {
+        partnerStatus.stage.name = translatePartnerName(partnerId, partnerStatus.stage.name);
+      }
+      if (partnerStatus.nextStage?.name) {
+        partnerStatus.nextStage.name = translatePartnerName(partnerId, partnerStatus.nextStage.name);
+      }
+    }
   } catch (error) {
     console.error('파트너 상태 계산 에러:', error);
     totalXP = 0;
@@ -425,7 +460,7 @@ export default function Pokedex() {
               {partnerStatus.nextStage ? (
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs font-bold text-gray-500">
-                    <span>{translate('pokedex.nextEvolution')}: {partnerStatus.nextStage.name} ({translate('common.level')} {partnerStatus.nextStage.minLevel})</span>
+                    <span>{translate('pokedex.nextEvolution')}: {translatePartnerName(partnerId, partnerStatus.nextStage.name)} ({translate('common.level')} {partnerStatus.nextStage.minLevel})</span>
                     {partnerStatus.levelForNext !== null && partnerStatus.levelForNext > 0 ? (
                       <span>{translate('pokedex.levelRemaining', { level: partnerStatus.levelForNext })}</span>
                     ) : (
