@@ -33,9 +33,18 @@ export default function PrivacyPolicy() {
             <h2 className="text-2xl font-bold text-pokemon-dark mb-4">{translate('privacy.section2Title')}</h2>
             <p>{translate('privacy.section2Desc')}</p>
             <ul className="list-disc pl-6 space-y-2">
-              <li><strong>{translate('privacy.section2Camera').split(':')[0]}:</strong> {translate('privacy.section2Camera').split(':')[1]}</li>
-              <li><strong>{translate('privacy.section2Storage').split(':')[0]}:</strong> {translate('privacy.section2Storage').split(':')[1]}</li>
-              <li><strong>{translate('privacy.section2ApiKey').split(':')[0]}:</strong> {translate('privacy.section2ApiKey').split(':')[1]}</li>
+              <li>{translate('privacy.section2Camera').includes(':') 
+                ? <><strong>{translate('privacy.section2Camera').split(':')[0]}:</strong> {translate('privacy.section2Camera').split(':')[1]}</>
+                : translate('privacy.section2Camera')
+              }</li>
+              <li>{translate('privacy.section2Storage').includes(':')
+                ? <><strong>{translate('privacy.section2Storage').split(':')[0]}:</strong> {translate('privacy.section2Storage').split(':')[1]}</>
+                : translate('privacy.section2Storage')
+              }</li>
+              <li>{translate('privacy.section2ApiKey').includes(':')
+                ? <><strong>{translate('privacy.section2ApiKey').split(':')[0]}:</strong> {translate('privacy.section2ApiKey').split(':')[1]}</>
+                : translate('privacy.section2ApiKey')
+              }</li>
             </ul>
             <p className="mt-4 text-sm text-gray-600">
               {translate('privacy.section2Important')}
