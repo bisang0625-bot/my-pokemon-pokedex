@@ -2,8 +2,10 @@ import { useState, useRef, useCallback } from 'react'
 import Webcam from 'react-webcam'
 import { analyzeCard } from '../services/geminiService'
 import { saveCardToPokedex } from '../utils/pokedexUtils'
+import { useLanguage } from '../contexts/LanguageContext'
 
 export default function CameraScan() {
+  const { translate, language } = useLanguage()
   const [isScanning, setIsScanning] = useState(false)
   const [capturedImage, setCapturedImage] = useState(null)
   const [analysisResult, setAnalysisResult] = useState(null)
@@ -118,14 +120,7 @@ export default function CameraScan() {
 
   const getTypeLabel = (type) => {
     const englishType = normalizeType(type);
-    const typeMap = {
-      normal: '노말', fire: '불꽃', water: '물', electric: '전기',
-      grass: '풀', ice: '얼음', fighting: '격투', poison: '독',
-      ground: '땅', flying: '비행', psychic: '에스퍼', bug: '벌레',
-      rock: '바위', ghost: '고스트', dragon: '드래곤', dark: '악',
-      steel: '강철', fairy: '페어리'
-    }
-    return typeMap[englishType] || type
+    return translate(`types.${englishType}`) || type
   }
 
   const getTypeColor = (type) => {
@@ -174,7 +169,7 @@ export default function CameraScan() {
         <div className="absolute top-1/2 left-1/2 w-[2px] h-4 bg-white/50 -translate-x-1/2 -translate-y-1/2"></div>
 
         <div className="absolute -bottom-8 left-0 right-0 text-center text-white font-bold text-shadow">
-          카드를 사각형 안에 맞춰주세요!
+          {translate('cameraScan.cardInFrame')}
         </div>
       </div>
     </div>
@@ -184,7 +179,7 @@ export default function CameraScan() {
     <div className="max-w-2xl mx-auto pb-10">
       {!capturedImage && (
         <h2 className="text-3xl font-black mb-6 text-center text-pokemon-dark font-display drop-shadow-sm">
-          📷 카드 스캔
+          📷 {translate('cameraScan.title')}
         </h2>
       )}
 
@@ -203,9 +198,9 @@ export default function CameraScan() {
                 onClick={startScan}
                 className="px-8 py-4 bg-pokemon-blue text-white rounded-2xl hover:bg-blue-700 transition-all text-xl font-bold shadow-lg hover:scale-105 active:scale-95"
               >
-                카메라 켜기
+                {translate('cameraScan.startCamera')}
               </button>
-              <p className="mt-4 text-gray-500">카드를 스캔해서 도감에 추가해보세요!</p>
+              <p className="mt-4 text-gray-500">{translate('cameraScan.scanDescription')}</p>
             </div>
           ) : (
             <div className="relative w-full overflow-hidden rounded-3xl shadow-2xl bg-black aspect-[3/4] sm:aspect-[4/3]">
@@ -217,7 +212,7 @@ export default function CameraScan() {
                     onClick={stopScan}
                     className="px-6 py-2 bg-white text-gray-900 rounded-full font-bold"
                   >
-                    돌아가기
+                    {translate('cameraScan.close')}
                   </button>
                 </div>
               ) : (
@@ -275,8 +270,8 @@ export default function CameraScan() {
             {isAnalyzing ? (
               <div className="bg-white rounded-2xl p-6 sm:p-8 text-center shadow-lg border-2 border-pokemon-yellow animate-pulse">
                 <div className="text-4xl mb-4 animate-spin-slow inline-block">⏳</div>
-                 <h3 className="text-xl font-bold text-gray-800 mb-2">몬스터 분석 중...</h3>
-                <p className="text-gray-500">도감을 펼치고 있어요!</p>
+                 <h3 className="text-xl font-bold text-gray-800 mb-2">{translate('cameraScan.analyzing')}</h3>
+                <p className="text-gray-500">{translate('cameraScan.analyzingSub')}</p>
               </div>
             ) : (
               !analysisResult && (
@@ -291,22 +286,22 @@ export default function CameraScan() {
                       <span className="text-2xl">{error.includes('할당량') ? '⏰' : '⚠️'}</span>
                       <div className="flex-1">
                         <h4 className={`font-bold mb-1 ${
-                          error.includes('할당량') 
+                          error.includes('할당량') || error.includes('quota') 
                             ? 'text-yellow-700' 
                             : 'text-red-700'
                         }`}>
-                          {error.includes('할당량') ? '분석 제한 안내' : '분석 실패'}
+                          {error.includes('할당량') || error.includes('quota') ? translate('cameraScan.quotaExceededTitle') : translate('cameraScan.analysisFailed')}
                         </h4>
                         <p className={`text-sm ${
-                          error.includes('할당량') 
+                          error.includes('할당량') || error.includes('quota')
                             ? 'text-yellow-600' 
                             : 'text-red-600'
                         }`}>
                           {error}
                         </p>
-                        {!error.includes('할당량') && (
+                        {!error.includes('할당량') && !error.includes('quota') && (
                           <p className="text-xs text-red-500 mt-2">
-                             💡 몬스터 카드를 명확하게 스캔해주세요!
+                             {translate('cameraScan.scanTip')}
                           </p>
                         )}
                       </div>
@@ -317,13 +312,13 @@ export default function CameraScan() {
                     onClick={analyzeImage}
                     className="w-full py-4 bg-gradient-to-r from-pokemon-blue to-blue-600 text-white rounded-2xl font-black text-xl shadow-lg hover:scale-105 transition-transform flex items-center justify-center gap-2"
                   >
-                    <span className="text-2xl">✨</span> 분석하기
+                    <span className="text-2xl">✨</span> {translate('cameraScan.analyzeButton')}
                   </button>
                   <button
                     onClick={resetScan}
                     className="w-full py-3 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200"
                   >
-                    다시 찍기
+                    {translate('cameraScan.retake')}
                   </button>
                 </div>
               )
@@ -378,13 +373,13 @@ export default function CameraScan() {
                     onClick={resetScan}
                     className="flex-1 py-3 bg-pokemon-dark text-white rounded-xl font-bold shadow-lg hover:bg-gray-800 transition-colors"
                   >
-                    닫기
+                    {translate('cameraScan.close')}
                   </button>
                   <button
                     onClick={startScan}
                     className="flex-1 py-3 bg-pokemon-yellow text-pokemon-dark rounded-xl font-bold shadow-lg hover:bg-yellow-400 transition-colors"
                   >
-                    다음 카드 S
+                    {translate('cameraScan.nextCard')}
                   </button>
                 </div>
               </div>

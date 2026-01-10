@@ -2,8 +2,10 @@ import { useState, useEffect, useMemo } from 'react'
 import { getCardsFromPokedex, deleteCardFromPokedex } from '../utils/pokedexUtils'
 import { calculateXP, getPartnerStatus } from '../utils/partnerUtils'
 import StarterSelection from '../components/StarterSelection'
+import { useLanguage } from '../contexts/LanguageContext'
 
 export default function Pokedex() {
+  const { translate, language } = useLanguage()
   const [cards, setCards] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedType, setSelectedType] = useState('all')
@@ -211,7 +213,7 @@ export default function Pokedex() {
   }, [cards])
 
   const deleteCard = (id) => {
-    if (window.confirm('정말 이 몬스터 카드를 삭제하시겠습니까?')) {
+    if (window.confirm(translate('pokedex.deleteConfirm'))) {
       try {
         const updatedCards = deleteCardFromPokedex(id)
         if (updatedCards.length === cards.length) {
@@ -327,19 +329,13 @@ export default function Pokedex() {
   const getTypeLabel = (type) => {
     // 'all'은 직접 처리 (normalizeType 호출 전)
     if (String(type).toLowerCase() === 'all') {
-      return '전체';
+      return translate('types.all');
     }
     // normalizeType 함수 사용
     const englishType = normalizeType(type);
     
-    const labels = {
-      normal: '노말', fire: '불꽃', water: '물', electric: '전기',
-      grass: '풀', ice: '얼음', fighting: '격투', poison: '독',
-      ground: '땅', flying: '비행', psychic: '에스퍼', bug: '벌레',
-      rock: '바위', ghost: '고스트', dragon: '드래곤', dark: '악',
-      steel: '강철', fairy: '페어리', all: '전체'
-    }
-    return labels[englishType] || type
+    // 번역 파일에서 타입 이름 가져오기
+    return translate(`types.${englishType}`) || type
   }
 
   // 희귀도별 별 표시
@@ -371,14 +367,7 @@ export default function Pokedex() {
   }
   
   const getRarityDescription = (rarity) => {
-    const descriptions = {
-      5: '👑 전설의 카드예요! 정말 특별해요!',
-      4: '💎 초희귀 카드예요! 엄청나게 귀해요!',
-      3: '✨ 희귀 카드예요! 좋은 카드예요!',
-      2: '⭐ 보통 카드예요! 괜찮은 카드예요!',
-      1: '🔸 일반 카드예요! 기본 카드예요!'
-    }
-    return descriptions[rarity] || descriptions[1]
+    return translate(`rarity.${rarity}`) || translate('rarity.1')
   }
 
 
@@ -396,7 +385,7 @@ export default function Pokedex() {
     <div className="min-h-screen pb-10">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl sm:text-4xl font-black text-pokemon-dark font-display drop-shadow-sm">
-          📚 내 몬스터 도감
+          📚 {translate('pokedex.title')}
         </h2>
         {/* 파트너 미니 표시 (모바일용) */}
         <div className="sm:hidden flex items-center gap-2 bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100">
@@ -430,15 +419,15 @@ export default function Pokedex() {
                   {partnerStatus.stage.name}
                 </h3>
                 <span className="text-gray-400 font-bold text-sm mb-1">
-                  (현재 XP: {totalXP})
+                  ({translate('pokedex.currentXP')}: {totalXP})
                 </span>
               </div>
               {partnerStatus.nextStage ? (
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs font-bold text-gray-500">
-                    <span>다음 진화: {partnerStatus.nextStage.name} (레벨 {partnerStatus.nextStage.minLevel})</span>
+                    <span>{translate('pokedex.nextEvolution')}: {partnerStatus.nextStage.name} ({translate('common.level')} {partnerStatus.nextStage.minLevel})</span>
                     {partnerStatus.levelForNext !== null && partnerStatus.levelForNext > 0 ? (
-                      <span>레벨 {partnerStatus.levelForNext} 남음</span>
+                      <span>{translate('pokedex.levelRemaining', { level: partnerStatus.levelForNext })}</span>
                     ) : (
                       <span>XP: {partnerStatus.xpForNext.toLocaleString()}</span>
                     )}
@@ -452,12 +441,12 @@ export default function Pokedex() {
                     </div>
                   </div>
                   <p className="text-xs text-gray-400 text-right">
-                    * 희귀한 카드를 모으면 더 빨리 성장해요! (현재 레벨: {partnerStatus.currentLevel})
+                    {translate('pokedex.rareCardsHint', { level: partnerStatus.currentLevel })}
                   </p>
                 </div>
               ) : (
                 <div className="py-2 px-4 bg-yellow-50 rounded-xl border border-yellow-200 text-yellow-700 font-bold text-center sm:text-left">
-                  🏆 최종 진화 완료! 정말 대단해요!
+                  {translate('pokedex.finalEvolution')}
                 </div>
               )}
             </div>
@@ -469,20 +458,20 @@ export default function Pokedex() {
       {cards.length > 0 && (
         <div className="mb-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border-2 border-blue-200">
-            <div className="text-xs font-bold text-blue-600 mb-1">총 카드</div>
-            <div className="text-2xl font-black text-blue-800">{cards.length}장</div>
+            <div className="text-xs font-bold text-blue-600 mb-1">{translate('pokedex.totalCards')}</div>
+            <div className="text-2xl font-black text-blue-800">{cards.length}{translate('common.cards')}</div>
           </div>
           <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-4 border-2 border-yellow-200">
-            <div className="text-xs font-bold text-yellow-600 mb-1">⭐ 5성 (전설)</div>
-            <div className="text-2xl font-black text-yellow-800">{stats.legendCards}장</div>
+            <div className="text-xs font-bold text-yellow-600 mb-1">{translate('pokedex.legendCards')}</div>
+            <div className="text-2xl font-black text-yellow-800">{stats.legendCards}{translate('common.cards')}</div>
           </div>
           <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 border-2 border-purple-200">
-            <div className="text-xs font-bold text-purple-600 mb-1">⭐ 4성 (초희귀)</div>
-            <div className="text-2xl font-black text-purple-800">{stats.ultraRareCards}장</div>
+            <div className="text-xs font-bold text-purple-600 mb-1">{translate('pokedex.ultraRareCards')}</div>
+            <div className="text-2xl font-black text-purple-800">{stats.ultraRareCards}{translate('common.cards')}</div>
           </div>
           <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border-2 border-green-200">
-            <div className="text-xs font-bold text-green-600 mb-1">⭐ 3성 (희귀)</div>
-            <div className="text-2xl font-black text-green-800">{stats.rareCards}장</div>
+            <div className="text-xs font-bold text-green-600 mb-1">{translate('pokedex.rareCards')}</div>
+            <div className="text-2xl font-black text-green-800">{stats.rareCards}{translate('common.cards')}</div>
           </div>
         </div>
       )}
@@ -493,7 +482,7 @@ export default function Pokedex() {
           <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-2xl">🔍</span>
           <input
             type="text"
-            placeholder="몬스터 이름 또는 별명 검색..."
+            placeholder={translate('pokedex.searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-gray-200 shadow-sm focus:border-pokemon-blue focus:ring-4 focus:ring-pokemon-blue/20 transition-all text-lg font-bold"
@@ -504,7 +493,7 @@ export default function Pokedex() {
         <div className="space-y-3">
           {/* 타입 필터 */}
           <div>
-            <div className="text-xs font-bold text-gray-500 mb-2 px-1">타입별</div>
+            <div className="text-xs font-bold text-gray-500 mb-2 px-1">{translate('pokedex.typeFilter')}</div>
             <div className="flex overflow-x-auto pb-2 gap-2 no-scrollbar">
               {['all', 'normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy'].map((type) => (
                 <button
@@ -527,7 +516,7 @@ export default function Pokedex() {
 
           {/* 희귀도 필터 */}
           <div>
-            <div className="text-xs font-bold text-gray-500 mb-2 px-1">희귀도별</div>
+            <div className="text-xs font-bold text-gray-500 mb-2 px-1">{translate('pokedex.rarityFilter')}</div>
             <div className="flex overflow-x-auto pb-2 gap-2 no-scrollbar">
               {['all', '5', '4', '3', '2', '1'].map((rarity) => (
                 <button
@@ -541,7 +530,7 @@ export default function Pokedex() {
                   {rarity === 'all' ? (
                     <>
                       <span>⭐</span>
-                      <span className="text-sm">전체</span>
+                      <span className="text-sm">{translate('pokedex.all')}</span>
                     </>
                   ) : (
                     <>
@@ -563,13 +552,13 @@ export default function Pokedex() {
 
           {/* 정렬 옵션 */}
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-bold text-gray-500">정렬:</span>
+            <span className="text-xs font-bold text-gray-500">{translate('pokedex.sortLabel')}</span>
             {[
-              { key: 'latest', label: '최신순', icon: '🕐' },
-              { key: 'rarity', label: '희귀도순', icon: '⭐' },
-              { key: 'hp', label: 'HP순', icon: '❤️' },
-              { key: 'power', label: '파워순', icon: '⚡' },
-              { key: 'name', label: '이름순', icon: '🔤' }
+              { key: 'latest', icon: '🕐' },
+              { key: 'rarity', icon: '⭐' },
+              { key: 'hp', icon: '❤️' },
+              { key: 'power', icon: '⚡' },
+              { key: 'name', icon: '🔤' }
             ].map((option) => (
               <button
                 key={option.key}
@@ -580,7 +569,7 @@ export default function Pokedex() {
                   }`}
               >
                 <span className="mr-1">{option.icon}</span>
-                {option.label}
+                {translate(`pokedex.sortBy.${option.key}`)}
               </button>
             ))}
           </div>
@@ -591,8 +580,8 @@ export default function Pokedex() {
       {sortedCards.length === 0 ? (
         <div className="text-center py-20 bg-white/50 rounded-3xl border-2 border-dashed border-gray-300">
           <div className="text-6xl mb-4 grayscale opacity-50">⚡️</div>
-          <p className="text-gray-500 font-bold text-lg">검색 결과가 없어요!</p>
-          <p className="text-gray-400">다른 필터를 선택해보세요.</p>
+          <p className="text-gray-500 font-bold text-lg">{translate('pokedex.noResults')}</p>
+          <p className="text-gray-400">{translate('pokedex.noResultsSub')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -678,7 +667,7 @@ export default function Pokedex() {
                     onClick={() => setExpandedCard(isExpanded ? null : card.id)}
                     className="w-full py-2 text-xs font-bold text-gray-600 hover:text-pokemon-blue transition-colors border border-gray-200 rounded-lg hover:border-pokemon-blue mb-3"
                   >
-                    {isExpanded ? '▲ 간략히 보기' : '▼ 더 보기'}
+                    {isExpanded ? `▲ ${translate('pokedex.collapse')}` : `▼ ${translate('pokedex.expand')}`}
                   </button>
 
                   {/* 확장된 상세 정보 */}
@@ -687,7 +676,7 @@ export default function Pokedex() {
                       {/* 설명 */}
                       {card.description && (
                         <div className="bg-gray-50 p-2 rounded-lg">
-                          <div className="text-xs font-bold text-gray-500 mb-1">설명</div>
+                          <div className="text-xs font-bold text-gray-500 mb-1">{translate('pokedex.description')}</div>
                           <div className="text-xs text-gray-700">{card.description}</div>
                         </div>
                       )}
@@ -696,13 +685,13 @@ export default function Pokedex() {
                       <div className="grid grid-cols-2 gap-2">
                         {card.strongAgainst && (
                           <div className="bg-green-50 p-2 rounded-lg border border-green-200">
-                            <div className="text-xs font-bold text-green-600 mb-1">💪 강점</div>
+                            <div className="text-xs font-bold text-green-600 mb-1">{translate('pokedex.strongAgainst')}</div>
                             <div className="text-xs text-green-700 font-bold">{getTypeLabel(card.strongAgainst)}</div>
                           </div>
                         )}
                         {card.weakAgainst && (
                           <div className="bg-red-50 p-2 rounded-lg border border-red-200">
-                            <div className="text-xs font-bold text-red-600 mb-1">⚠️ 약점</div>
+                            <div className="text-xs font-bold text-red-600 mb-1">{translate('pokedex.weakAgainst')}</div>
                             <div className="text-xs text-red-700 font-bold">{getTypeLabel(card.weakAgainst)}</div>
                           </div>
                         )}
@@ -710,7 +699,7 @@ export default function Pokedex() {
 
                       {/* 수집 날짜 */}
                       <div className="text-xs text-gray-400 text-center pt-1">
-                        📅 {new Date(card.scannedAt || card.createdAt || Date.now()).toLocaleDateString('ko-KR')}
+                        📅 {new Date(card.scannedAt || card.createdAt || Date.now()).toLocaleDateString(language === 'ko' ? 'ko-KR' : language === 'nl' ? 'nl-NL' : 'en-US')}
                       </div>
                     </div>
                   )}
