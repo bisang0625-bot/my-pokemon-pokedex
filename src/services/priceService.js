@@ -93,6 +93,32 @@ export function calculateTotalValue(cards) {
   return { totalMin, totalMax, totalEstimated, cardCount: cards.length, averagePrice: Math.round(totalEstimated / cards.length) || 0 };
 }
 
-export function formatPrice(price) {
-  return new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW', maximumFractionDigits: 0 }).format(price);
+// 환율 (대략적인 환율, 실제 환율과는 다를 수 있음)
+const EXCHANGE_RATES = {
+  KRW: 1,      // 기준 통화
+  USD: 1300,   // 1 USD = 1300 KRW
+  EUR: 1400    // 1 EUR = 1400 KRW
+};
+
+export function formatPrice(price, language = 'ko') {
+  // 언어에 따른 통화 설정
+  let currency = 'KRW';
+  let locale = 'ko-KR';
+  let convertedPrice = price; // 원화 기준 가격
+  
+  if (language === 'en') {
+    currency = 'USD';
+    locale = 'en-US';
+    convertedPrice = Math.round(price / EXCHANGE_RATES.USD);
+  } else if (language === 'nl') {
+    currency = 'EUR';
+    locale = 'nl-NL';
+    convertedPrice = Math.round(price / EXCHANGE_RATES.EUR);
+  }
+  
+  return new Intl.NumberFormat(locale, { 
+    style: 'currency', 
+    currency: currency, 
+    maximumFractionDigits: 0 
+  }).format(convertedPrice);
 }

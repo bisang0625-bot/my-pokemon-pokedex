@@ -132,13 +132,13 @@ export default function ParentMode() {
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-gray-600">{translate('parentMode.totalEstimatedValue')}</span>
                   <span className="text-3xl font-black text-green-600 tracking-tight">
-                    {totalValue ? formatPrice(totalValue.totalEstimated) : formatPrice(0)}
+                    {totalValue ? formatPrice(totalValue.totalEstimated, language) : formatPrice(0, language)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center border-t border-green-200 pt-3">
                   <span className="text-sm text-gray-500">{translate('parentMode.averagePrice')}</span>
                   <span className="text-sm font-bold text-green-700">
-                    {totalValue ? formatPrice(totalValue.averagePrice) : formatPrice(0)}
+                    {totalValue ? formatPrice(totalValue.averagePrice, language) : formatPrice(0, language)}
                   </span>
                 </div>
               </>
@@ -179,10 +179,10 @@ export default function ParentMode() {
                           </div>
                         </td>
                         <td className="p-4 text-right font-black text-green-600">
-                          {formatPrice(card.price?.estimated || 0)}
+                          {formatPrice(card.price?.estimated || 0, language)}
                         </td>
                         <td className="p-4 text-right text-xs text-gray-500 hidden sm:table-cell">
-                          {formatPrice(card.price?.min || 0)} ~ {formatPrice(card.price?.max || 0)}
+                          {formatPrice(card.price?.min || 0, language)} ~ {formatPrice(card.price?.max || 0, language)}
                         </td>
                       </tr>
                     ))}
