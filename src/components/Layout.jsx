@@ -60,7 +60,7 @@ export default function Layout({ children }) {
                       key={lang.code}
                       onClick={() => changeLanguage(lang.code)}
                       className={`w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors first:rounded-t-lg last:rounded-b-lg flex items-center gap-2 ${
-                        language === lang.code ? 'bg-pokemon-blue/10 font-bold' : ''
+                        language === lang.code ? 'bg-pokemon-blue/10 font-bold text-pokemon-blue' : 'text-gray-700'
                       }`}
                     >
                       <span>{lang.flag}</span>
@@ -104,7 +104,7 @@ export default function Layout({ children }) {
                   key={lang.code}
                   onClick={() => changeLanguage(lang.code)}
                   className={`w-full text-left px-3 py-2 hover:bg-gray-100 transition-colors first:rounded-t-lg last:rounded-b-lg flex items-center gap-2 ${
-                    language === lang.code ? 'bg-pokemon-blue/10 font-bold' : ''
+                    language === lang.code ? 'bg-pokemon-blue/10 font-bold text-pokemon-blue' : 'text-gray-700'
                   }`}
                 >
                   <span>{lang.flag}</span>
