@@ -41,8 +41,7 @@ export default function CameraScan() {
     } catch (err) {
       console.error('카메라 권한 오류:', err)
       setCameraError(
-        `카메라 접근 권한이 필요합니다. 
-        브라우저 주소창의 자물쇠 아이콘(🔒)을 클릭하여 카메라 권한을 허용해주세요.`
+        `${translate('cameraScan.cameraPermissionRequired')}\n${translate('cameraScan.cameraPermissionHint')}`
       )
       setIsScanning(true)
     }
