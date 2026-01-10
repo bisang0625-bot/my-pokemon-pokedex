@@ -122,6 +122,26 @@ export const translations = {
       power: '⚡',
       cards: '장',
       level: '레벨'
+    },
+    
+    // ParentalGate 컴포넌트
+    parentalGate: {
+      newPassword: '새로운 보호자 비밀번호 설정',
+      confirmPassword: '비밀번호 확인',
+      enterPassword: '보호자 비밀번호 입력',
+      mathChallenge: '성인 인증 (수학 문제)',
+      enter4Digits: '4자리 숫자를 입력해주세요.',
+      enterAgain: '한 번 더 입력해주세요.',
+      enterPassword4Digits: '설정하신 4자리 숫자를 입력해주세요.',
+      enterAnswer: '아래 문제의 정답을 입력하세요.',
+      resetPassword: '비밀번호 초기화',
+      wrongPassword: '비밀번호가 틀렸습니다.',
+      passwordMismatch: '비밀번호가 일치하지 않습니다. 처음부터 다시 설정해주세요.',
+      wrongAnswer: '틀렸습니다. 다시 시도해주세요.',
+      resetSuccess: '초기화되었습니다. 새 비밀번호를 설정해주세요.',
+      answerPlaceholder: '정답 입력',
+      cancel: '취소',
+      confirm: '확인'
     }
   },
   
@@ -236,6 +256,26 @@ export const translations = {
       power: '⚡',
       cards: ' cards',
       level: 'Level'
+    },
+    
+    // ParentalGate component
+    parentalGate: {
+      newPassword: 'Set New Guardian Password',
+      confirmPassword: 'Confirm Password',
+      enterPassword: 'Enter Guardian Password',
+      mathChallenge: 'Adult Verification (Math Problem)',
+      enter4Digits: 'Please enter a 4-digit number.',
+      enterAgain: 'Please enter again.',
+      enterPassword4Digits: 'Please enter your 4-digit password.',
+      enterAnswer: 'Enter the answer to the problem below.',
+      resetPassword: 'Reset Password',
+      wrongPassword: 'Incorrect password.',
+      passwordMismatch: 'Passwords do not match. Please set again from the beginning.',
+      wrongAnswer: 'Incorrect. Please try again.',
+      resetSuccess: 'Reset complete. Please set a new password.',
+      answerPlaceholder: 'Enter answer',
+      cancel: 'Cancel',
+      confirm: 'Confirm'
     }
   },
   
@@ -350,6 +390,26 @@ export const translations = {
       power: '⚡',
       cards: ' kaarten',
       level: 'Niveau'
+    },
+    
+    // ParentalGate component
+    parentalGate: {
+      newPassword: 'Nieuw Beveiligingswachtwoord Instellen',
+      confirmPassword: 'Wachtwoord Bevestigen',
+      enterPassword: 'Voer Beveiligingswachtwoord In',
+      mathChallenge: 'Volwassenenverificatie (Wiskundige Vraag)',
+      enter4Digits: 'Voer een 4-cijferig nummer in.',
+      enterAgain: 'Voer opnieuw in.',
+      enterPassword4Digits: 'Voer uw 4-cijferig wachtwoord in.',
+      enterAnswer: 'Voer het antwoord op de onderstaande vraag in.',
+      resetPassword: 'Wachtwoord Resetten',
+      wrongPassword: 'Onjuist wachtwoord.',
+      passwordMismatch: 'Wachtwoorden komen niet overeen. Stel opnieuw in vanaf het begin.',
+      wrongAnswer: 'Onjuist. Probeer het opnieuw.',
+      resetSuccess: 'Reset voltooid. Stel een nieuw wachtwoord in.',
+      answerPlaceholder: 'Voer antwoord in',
+      cancel: 'Annuleren',
+      confirm: 'Bevestigen'
     }
   }
 };

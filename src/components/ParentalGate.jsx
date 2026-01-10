@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
+import { useLanguage } from '../contexts/LanguageContext'
 
 export default function ParentalGate({ onSuccess }) {
+    const { translate } = useLanguage()
     const [pin, setPin] = useState(['', '', '', ''])
     const [storedPin, setStoredPin] = useState(null)
     const [mode, setMode] = useState('check') // 'check', 'create', 'confirm'
@@ -68,10 +70,10 @@ export default function ParentalGate({ onSuccess }) {
     const checkMathAnswer = () => {
         if (parseInt(mathAnswer) === mathProblem.answer) {
             localStorage.removeItem('parentPin')
-            alert('초기화되었습니다. 새 비밀번호를 설정해주세요.')
+            alert(translate('parentalGate.resetSuccess'))
             window.location.reload()
         } else {
-            setError('틀렸습니다. 다시 시도해주세요.')
+            setError(translate('parentalGate.wrongAnswer'))
             setMathAnswer('')
             setTimeout(() => {
                 setError('')
@@ -107,17 +109,17 @@ export default function ParentalGate({ onSuccess }) {
     }
 
     const getTitle = () => {
-        if (mode === 'create') return '새로운 보호자 비밀번호 설정'
-        if (mode === 'confirm') return '비밀번호 확인'
-        if (mode === 'reset_challenge') return '성인 인증 (수학 문제)'
-        return '보호자 비밀번호 입력'
+        if (mode === 'create') return translate('parentalGate.newPassword')
+        if (mode === 'confirm') return translate('parentalGate.confirmPassword')
+        if (mode === 'reset_challenge') return translate('parentalGate.mathChallenge')
+        return translate('parentalGate.enterPassword')
     }
 
     const getDescription = () => {
-        if (mode === 'create') return '4자리 숫자를 입력해주세요.'
-        if (mode === 'confirm') return '한 번 더 입력해주세요.'
-        if (mode === 'reset_challenge') return '아래 문제의 정답을 입력하세요.'
-        return '설정하신 4자리 숫자를 입력해주세요.'
+        if (mode === 'create') return translate('parentalGate.enter4Digits')
+        if (mode === 'confirm') return translate('parentalGate.enterAgain')
+        if (mode === 'reset_challenge') return translate('parentalGate.enterAnswer')
+        return translate('parentalGate.enterPassword4Digits')
     }
 
     return (
@@ -140,7 +142,7 @@ export default function ParentalGate({ onSuccess }) {
                                 value={mathAnswer}
                                 onChange={(e) => setMathAnswer(e.target.value)}
                                 className="w-full text-center text-2xl font-bold py-3 border-2 border-gray-300 rounded-xl mb-4 focus:border-pokemon-blue outline-none"
-                                placeholder="정답 입력"
+                                placeholder={translate('parentalGate.answerPlaceholder')}
                                 autoFocus
                             />
                             <div className="flex gap-2">
@@ -151,13 +153,13 @@ export default function ParentalGate({ onSuccess }) {
                                     }}
                                     className="flex-1 py-3 bg-gray-200 rounded-xl font-bold text-gray-600"
                                 >
-                                    취소
+                                    {translate('parentalGate.cancel')}
                                 </button>
                                 <button
                                     onClick={checkMathAnswer}
                                     className="flex-1 py-3 bg-pokemon-blue text-white rounded-xl font-bold"
                                 >
-                                    확인
+                                    {translate('parentalGate.confirm')}
                                 </button>
                             </div>
                         </div>
@@ -221,7 +223,7 @@ export default function ParentalGate({ onSuccess }) {
                                 onClick={handleResetRequest}
                                 className="w-full text-center text-xs text-gray-400 mt-6 underline"
                             >
-                                비밀번호 초기화
+                                {translate('parentalGate.resetPassword')}
                             </button>
                         </>
                     )}
