@@ -3,6 +3,7 @@ import Webcam from 'react-webcam'
 import { analyzeCard } from '../services/geminiService'
 import { saveCardToPokedex } from '../utils/pokedexUtils'
 import { useLanguage } from '../contexts/LanguageContext'
+import { compressImage } from '../utils/imageUtils'
 
 export default function CameraScan() {
   const { translate, language } = useLanguage()
@@ -20,10 +21,20 @@ export default function CameraScan() {
     facingMode: 'environment'
   }
 
-  const capture = useCallback(() => {
+  const capture = useCallback(async () => {
     if (webcamRef.current) {
-      const imageSrc = webcamRef.current.getScreenshot()
-      setCapturedImage(imageSrc)
+      const originalImageSrc = webcamRef.current.getScreenshot()
+      
+      try {
+        // 이미지 압축 (최대 800x800, 품질 70%)
+        const compressedImageSrc = await compressImage(originalImageSrc, 800, 800, 0.7)
+        setCapturedImage(compressedImageSrc)
+      } catch (error) {
+        console.error('이미지 압축 실패, 원본 사용:', error)
+        // 압축 실패 시 원본 사용
+        setCapturedImage(originalImageSrc)
+      }
+      
       setIsScanning(false)
     }
   }, [webcamRef])
