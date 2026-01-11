@@ -72,7 +72,13 @@ export default function CameraScan() {
       setAnalysisResult(result)
       saveCardToPokedex(capturedImage, result)
     } catch (err) {
-      const errorMessage = err.message || '카드 분석 중 오류가 발생했습니다.'
+      let errorMessage = err.message || '카드 분석 중 오류가 발생했습니다.'
+      
+      // localStorage quota exceeded 에러 처리
+      if (err.message === 'STORAGE_QUOTA_EXCEEDED') {
+        errorMessage = translate('cameraScan.storageQuotaExceeded')
+      }
+      
       setError(errorMessage)
       console.error('분석 오류:', err)
       
@@ -277,28 +283,32 @@ export default function CameraScan() {
                 <div className="flex flex-col gap-3 max-w-sm mx-auto w-full px-4 sm:px-0">
                 {error && (
                   <div className={`border-2 rounded-xl p-4 mb-2 ${
-                    error.includes('할당량') || error.includes('quota') 
+                    error.includes('할당량') || error.includes('quota') || error.includes('저장 공간') || error.includes('Storage') || error.includes('Opslagruimte')
                       ? 'bg-yellow-50 border-yellow-200' 
                       : 'bg-red-50 border-red-200'
                   }`}>
                     <div className="flex items-start gap-2">
-                      <span className="text-2xl">{error.includes('할당량') ? '⏰' : '⚠️'}</span>
+                      <span className="text-2xl">{error.includes('할당량') || error.includes('저장 공간') || error.includes('Storage') || error.includes('Opslagruimte') ? '💾' : '⚠️'}</span>
                       <div className="flex-1">
                         <h4 className={`font-bold mb-1 ${
-                          error.includes('할당량') || error.includes('quota') 
+                          error.includes('할당량') || error.includes('quota') || error.includes('저장 공간') || error.includes('Storage') || error.includes('Opslagruimte')
                             ? 'text-yellow-700' 
                             : 'text-red-700'
                         }`}>
-                          {error.includes('할당량') || error.includes('quota') ? translate('cameraScan.quotaExceededTitle') : translate('cameraScan.analysisFailed')}
+                          {error.includes('저장 공간') || error.includes('Storage') || error.includes('Opslagruimte') 
+                            ? translate('cameraScan.storageQuotaExceededTitle')
+                            : error.includes('할당량') || error.includes('quota') 
+                              ? translate('cameraScan.quotaExceededTitle') 
+                              : translate('cameraScan.analysisFailed')}
                         </h4>
                         <p className={`text-sm ${
-                          error.includes('할당량') || error.includes('quota')
+                          error.includes('할당량') || error.includes('quota') || error.includes('저장 공간') || error.includes('Storage') || error.includes('Opslagruimte')
                             ? 'text-yellow-600' 
                             : 'text-red-600'
                         }`}>
                           {error}
                         </p>
-                        {!error.includes('할당량') && !error.includes('quota') && (
+                        {!error.includes('할당량') && !error.includes('quota') && !error.includes('저장 공간') && !error.includes('Storage') && !error.includes('Opslagruimte') && (
                           <p className="text-xs text-red-500 mt-2">
                              {translate('cameraScan.scanTip')}
                           </p>

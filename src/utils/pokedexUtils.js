@@ -54,33 +54,51 @@ function convertTypeToEnglish(koreanType) {
  * @param {Object} analysisResult - 분석 결과 객체
  */
 export function saveCardToPokedex(imageUrl, analysisResult) {
-  const savedCards = JSON.parse(localStorage.getItem('pokedexCards') || '[]')
+  try {
+    const savedCards = JSON.parse(localStorage.getItem('pokedexCards') || '[]')
 
-  // 타입을 영어 코드로 변환
-  const typeEnglish = convertTypeToEnglish(analysisResult.type);
+    // 타입을 영어 코드로 변환
+    const typeEnglish = convertTypeToEnglish(analysisResult.type);
 
-  const newCard = {
-    id: Date.now().toString(),
-    image: imageUrl,
-    name: analysisResult.name || '알 수 없는 몬스터',
-    type: typeEnglish, // 영어 코드로 저장
-    typeKorean: analysisResult.type || '노말', // 한국어 타입도 별도로 저장 (표시용)
-    hp: analysisResult.hp || 0,
-    rarity: analysisResult.rarity || 1,
-    description: analysisResult.description || '',
-    powerLevel: analysisResult.powerLevel || 50,
-    strongAgainst: analysisResult.strongAgainst || '',
-    weakAgainst: analysisResult.weakAgainst || '',
-    nickname: analysisResult.nickname || '',
-    scannedAt: new Date().toISOString(),
-    // _isOfficial: 내부 전용 필드 (위조/비공식 카드 여부, UI에는 표시 안 함)
-    _isOfficial: analysisResult._isOfficial !== false // 기본값은 true
+    const newCard = {
+      id: Date.now().toString(),
+      image: imageUrl,
+      name: analysisResult.name || '알 수 없는 몬스터',
+      type: typeEnglish, // 영어 코드로 저장
+      typeKorean: analysisResult.type || '노말', // 한국어 타입도 별도로 저장 (표시용)
+      hp: analysisResult.hp || 0,
+      rarity: analysisResult.rarity || 1,
+      description: analysisResult.description || '',
+      powerLevel: analysisResult.powerLevel || 50,
+      strongAgainst: analysisResult.strongAgainst || '',
+      weakAgainst: analysisResult.weakAgainst || '',
+      nickname: analysisResult.nickname || '',
+      scannedAt: new Date().toISOString(),
+      // _isOfficial: 내부 전용 필드 (위조/비공식 카드 여부, UI에는 표시 안 함)
+      _isOfficial: analysisResult._isOfficial !== false // 기본값은 true
+    }
+
+    savedCards.push(newCard)
+    
+    try {
+      localStorage.setItem('pokedexCards', JSON.stringify(savedCards))
+    } catch (storageError) {
+      // localStorage quota exceeded 에러 처리
+      if (storageError.name === 'QuotaExceededError' || storageError.name === 'NS_ERROR_DOM_QUOTA_REACHED' || storageError.message.includes('quota')) {
+        throw new Error('STORAGE_QUOTA_EXCEEDED')
+      }
+      throw storageError
+    }
+
+    return newCard
+  } catch (error) {
+    // 이미 STORAGE_QUOTA_EXCEEDED 에러인 경우 그대로 throw
+    if (error.message === 'STORAGE_QUOTA_EXCEEDED') {
+      throw error
+    }
+    // 기타 에러는 다시 throw
+    throw error
   }
-
-  savedCards.push(newCard)
-  localStorage.setItem('pokedexCards', JSON.stringify(savedCards))
-
-  return newCard
 }
 
 /**

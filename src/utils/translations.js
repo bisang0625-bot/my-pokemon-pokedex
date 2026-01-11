@@ -105,6 +105,8 @@ export const translations = {
       scanTip: '💡 몬스터 카드를 명확하게 스캔해주세요!',
       quotaExceeded: '오늘 카드 분석 할당량을 모두 사용했어요. {minutes}분 후에 다시 시도해주세요! 🕐',
       quotaExceededTitle: '분석 제한 안내',
+      storageQuotaExceeded: '저장 공간이 부족합니다. 부모 모드에서 일부 카드를 삭제한 후 다시 시도해주세요.',
+      storageQuotaExceededTitle: '저장 공간 부족',
       analysisFailed: '분석 실패'
     },
     
@@ -371,6 +373,8 @@ export const translations = {
       scanTip: '💡 Please scan the monster card clearly!',
       quotaExceeded: 'Daily card analysis quota exceeded. Please try again in {minutes} minutes! 🕐',
       quotaExceededTitle: 'Analysis Limit Notice',
+      storageQuotaExceeded: 'Storage space is full. Please delete some cards in Parent Mode and try again.',
+      storageQuotaExceededTitle: 'Storage Full',
       analysisFailed: 'Analysis Failed'
     },
     
@@ -635,6 +639,8 @@ export const translations = {
       scanTip: '💡 Scan de monstarkaart duidelijk!',
       quotaExceeded: 'Dagelijkse kaartanalysequota overschreden. Probeer het over {minutes} minuten opnieuw! 🕐',
       quotaExceededTitle: 'Analyse Limiet Kennisgeving',
+      storageQuotaExceeded: 'Opslagruimte is vol. Verwijder enkele kaarten in Oudermodus en probeer het opnieuw.',
+      storageQuotaExceededTitle: 'Opslagruimte Vol',
       analysisFailed: 'Analyse Mislukt'
     },
     
