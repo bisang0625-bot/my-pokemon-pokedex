@@ -118,7 +118,7 @@ function needsCompression(imageSrc) {
 }
 
 /**
- * 도감에서 카드 가져오기 (기존 이미지 자동 압축 포함)
+ * 도감에서 카드 가져오기
  * @returns {Array} 저장된 카드 배열
  */
 export function getCardsFromPokedex() {
@@ -127,24 +127,46 @@ export function getCardsFromPokedex() {
     if (!cardsJson) return []
     
     const cards = JSON.parse(cardsJson)
-    if (!Array.isArray(cards)) return []
-    
-    // 마이그레이션: 압축되지 않은 이미지가 있는지 확인
-    const migrationKey = 'imageCompressionMigrationDone'
-    const migrationDone = localStorage.getItem(migrationKey) === 'true'
-    
-    if (!migrationDone && cards.length > 0) {
-      // 백그라운드에서 점진적으로 압축 (비동기)
-      compressExistingImages(cards, migrationKey).catch(error => {
-        console.error('이미지 압축 마이그레이션 에러:', error)
-      })
-    }
-    
-    return cards
+    return Array.isArray(cards) ? cards : []
   } catch (error) {
     console.error('도감 카드 로드 에러:', error)
     // 에러 발생 시 빈 배열 반환
     return []
+  }
+}
+
+/**
+ * 기존 이미지 압축 마이그레이션 (1회성, 앱 초기화 시 한 번만 실행)
+ * @returns {Promise<void>}
+ */
+export async function runImageCompressionMigration() {
+  const migrationKey = 'imageCompressionMigrationDone'
+  const migrationDone = localStorage.getItem(migrationKey) === 'true'
+  
+  // 이미 마이그레이션이 완료되었으면 실행하지 않음
+  if (migrationDone) {
+    return
+  }
+  
+  try {
+    const cardsJson = localStorage.getItem('pokedexCards')
+    if (!cardsJson) {
+      localStorage.setItem(migrationKey, 'true')
+      return
+    }
+    
+    const cards = JSON.parse(cardsJson)
+    if (!Array.isArray(cards) || cards.length === 0) {
+      localStorage.setItem(migrationKey, 'true')
+      return
+    }
+    
+    // 백그라운드에서 점진적으로 압축
+    await compressExistingImages(cards, migrationKey)
+  } catch (error) {
+    console.error('이미지 압축 마이그레이션 에러:', error)
+    // 에러 발생 시에도 완료 플래그 설정하여 무한 루프 방지
+    localStorage.setItem(migrationKey, 'true')
   }
 }
 

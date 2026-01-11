@@ -2,6 +2,12 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
+import { runImageCompressionMigration } from './utils/pokedexUtils'
+
+// 앱 초기화 시 기존 이미지 압축 마이그레이션 실행 (1회성)
+runImageCompressionMigration().catch(error => {
+  console.error('이미지 압축 마이그레이션 초기화 에러:', error)
+})
 
 // Service Worker 등록 (PWA 지원) - Safari 호환성 개선
 if ('serviceWorker' in navigator) {
