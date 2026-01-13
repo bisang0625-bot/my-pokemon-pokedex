@@ -4,8 +4,8 @@ import { useLanguage } from '../contexts/LanguageContext'
 export default function StarterSelection({ onSelect }) {
     const { translate } = useLanguage()
     const starters = [PARTNERS.fire, PARTNERS.water, PARTNERS.grass].map(starter => ({
-      ...starter,
-      name: translate(`partners.${starter.id}.name`)
+        ...starter,
+        name: translate(`partners.${starter.id}.name`)
     }))
 
     return (
@@ -29,11 +29,11 @@ export default function StarterSelection({ onSelect }) {
                                 onClick={() => onSelect(starter.id)}
                                 className={`group relative flex flex-col items-center p-4 sm:p-6 rounded-2xl border-4 transition-all duration-300 hover:scale-105 active:scale-95 ${starter.borderColor} bg-white hover:bg-gray-50`}
                             >
-                                <div className="w-24 h-24 sm:w-32 sm:h-32 mb-3 sm:mb-4 transform group-hover:scale-110 transition-transform duration-300 drop-shadow-lg flex items-center justify-center">
+                                <div className="w-24 h-24 sm:w-32 sm:h-32 mb-3 sm:mb-4 transform transition-transform duration-300 drop-shadow-lg flex items-center justify-center overflow-hidden rounded-full">
                                     <img
                                         src={starter.stages[0].image}
                                         alt={starter.name}
-                                        className="w-full h-full object-contain filter drop-shadow-lg"
+                                        className="w-full h-full object-contain filter drop-shadow-lg group-hover:scale-125 scale-110 transition-transform duration-300"
                                     />
                                 </div>
                                 <h3 className={`text-lg sm:text-xl font-black mb-2 ${starter.textColor}`}>

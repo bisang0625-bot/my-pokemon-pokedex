@@ -40,19 +40,19 @@ export default function Pokedex() {
       console.warn('normalizeType: 타입이 없음');
       return 'normal';
     }
-    
+
     // 문자열로 변환
     const typeStr = String(type).trim();
-    
+
     // 'all'은 특별 처리 (필터용)
     if (typeStr.toLowerCase() === 'all') {
       return 'all';
     }
-    
+
     const koreanToEnglish = {
       '노말': 'normal',
-      '불꽃': 'fire', 
-      '물': 'water', 
+      '불꽃': 'fire',
+      '물': 'water',
       '전기': 'electric',
       '풀': 'grass',
       '얼음': 'ice',
@@ -69,20 +69,20 @@ export default function Pokedex() {
       '강철': 'steel',
       '페어리': 'fairy'
     };
-    
+
     // 한국어 타입이면 영어로 변환 (정확한 매칭)
     if (koreanToEnglish.hasOwnProperty(typeStr)) {
       const result = koreanToEnglish[typeStr];
       return result;
     }
-    
+
     // 이미 영어 코드인 경우 (소문자 변환) - 모든 포켓몬 타입 지원
     const lowerType = typeStr.toLowerCase();
     const allTypes = ['normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy'];
     if (allTypes.includes(lowerType)) {
       return lowerType;
     }
-    
+
     // 디버깅: 알 수 없는 타입 로그
     console.warn('알 수 없는 타입:', type, '(원본:', typeStr, ') - 기본값 normal 반환');
     return 'normal';
@@ -91,7 +91,7 @@ export default function Pokedex() {
   // 파트너 이름 번역 함수
   const translatePartnerName = (partnerId, name) => {
     if (!partnerId || !name) return name;
-    
+
     // 한국어 이름을 번역 키로 변환
     const nameMap = {
       '이그니스': { key: 'partners.fire.stages.1', id: 'fire', stage: 1 },
@@ -104,23 +104,23 @@ export default function Pokedex() {
       '테라 스피릿': { key: 'partners.grass.stages.2', id: 'grass', stage: 2 },
       '테라 마스터': { key: 'partners.grass.stages.3', id: 'grass', stage: 3 }
     };
-    
+
     const mapping = nameMap[name];
     if (mapping) {
       return translate(mapping.key);
     }
-    
+
     return name;
   }
 
   // 파트너 상태 계산 (에러 방지)
   let totalXP = 0;
   let partnerStatus = null;
-  
+
   try {
     totalXP = calculateXP(cards) || 0;
     partnerStatus = partnerId ? getPartnerStatus(partnerId, totalXP) : null;
-    
+
     // 파트너 이름 번역 적용
     if (partnerStatus) {
       if (partnerStatus.stage?.name) {
@@ -140,7 +140,7 @@ export default function Pokedex() {
   const filteredCards = useMemo(() => {
     try {
       if (!cards || !Array.isArray(cards)) return []
-      
+
       let filtered = cards
 
       // 타입 필터 (한국어/영어 모두 처리)
@@ -192,7 +192,7 @@ export default function Pokedex() {
   const sortedCards = useMemo(() => {
     try {
       if (!filteredCards || !Array.isArray(filteredCards)) return []
-      
+
       const sorted = [...filteredCards].sort((a, b) => {
         try {
           switch (sortBy) {
@@ -225,9 +225,9 @@ export default function Pokedex() {
   const stats = useMemo(() => {
     try {
       if (!cards || !Array.isArray(cards)) {
-        return { rarityCounts: {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}, legendCards: 0, ultraRareCards: 0, rareCards: 0 }
+        return { rarityCounts: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }, legendCards: 0, ultraRareCards: 0, rareCards: 0 }
       }
-      
+
       const rarityCounts = {
         1: cards.filter(c => c?.rarity === 1).length,
         2: cards.filter(c => c?.rarity === 2).length,
@@ -239,11 +239,11 @@ export default function Pokedex() {
       const legendCards = rarityCounts[5] || 0 // 5성 = 전설
       const ultraRareCards = rarityCounts[4] || 0 // 4성 = 초희귀
       const rareCards = rarityCounts[3] || 0 // 3성 = 희귀
-      
+
       return { rarityCounts, legendCards, ultraRareCards, rareCards }
     } catch (error) {
       console.error('통계 계산 에러:', error)
-      return { rarityCounts: {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}, legendCards: 0, ultraRareCards: 0, rareCards: 0 }
+      return { rarityCounts: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }, legendCards: 0, ultraRareCards: 0, rareCards: 0 }
     }
   }, [cards])
 
@@ -273,16 +273,16 @@ export default function Pokedex() {
   const typeCounts = useMemo(() => {
     try {
       const allTypes = ['normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy'];
-      
+
       if (!cards || !Array.isArray(cards)) {
         const emptyCounts = { all: 0 };
         allTypes.forEach(type => { emptyCounts[type] = 0; });
         return emptyCounts;
       }
-      
+
       const counts = { all: cards.length };
       allTypes.forEach(type => { counts[type] = 0; });
-      
+
       cards.forEach(card => {
         try {
           const cardType = card?.type || card?.typeKorean || '';
@@ -294,7 +294,7 @@ export default function Pokedex() {
           console.warn('카드 타입 정규화 에러:', card?.name, card?.type, err);
         }
       });
-      
+
       return counts;
     } catch (error) {
       console.error('타입별 카드 수 계산 에러:', error)
@@ -311,7 +311,7 @@ export default function Pokedex() {
       if (!cards || !Array.isArray(cards)) {
         return { all: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
       }
-      
+
       return {
         all: cards.length,
         1: cards.filter(c => c?.rarity === 1).length,
@@ -351,7 +351,7 @@ export default function Pokedex() {
     }
     const englishType = normalizeType(type);
     const colors = {
-      normal: 'bg-gray-400', fire: 'bg-red-500', water: 'bg-blue-500', 
+      normal: 'bg-gray-400', fire: 'bg-red-500', water: 'bg-blue-500',
       electric: 'bg-yellow-400', grass: 'bg-green-500', ice: 'bg-cyan-300',
       fighting: 'bg-red-700', poison: 'bg-purple-500', ground: 'bg-yellow-700',
       flying: 'bg-indigo-300', psychic: 'bg-pink-500', bug: 'bg-green-600',
@@ -368,7 +368,7 @@ export default function Pokedex() {
     }
     // normalizeType 함수 사용
     const englishType = normalizeType(type);
-    
+
     // 번역 파일에서 타입 이름 가져오기
     return translate(`types.${englishType}`) || type
   }
@@ -400,7 +400,7 @@ export default function Pokedex() {
     }
     return colors[rarity] || colors[1]
   }
-  
+
   const getRarityDescription = (rarity) => {
     return translate(`rarity.${rarity}`) || translate('rarity.1')
   }
@@ -424,7 +424,13 @@ export default function Pokedex() {
         </h2>
         {/* 파트너 미니 표시 (모바일용) */}
         <div className="sm:hidden flex items-center gap-2 bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100">
-          <img src={partnerStatus?.stage.image} alt={partnerStatus?.stage.name} className="w-8 h-8 object-contain" />
+          <div className="w-8 h-8 overflow-hidden rounded-full flex items-center justify-center">
+            <img
+              src={partnerStatus?.stage.image}
+              alt={partnerStatus?.stage.name}
+              className="w-full h-full object-contain scale-125"
+            />
+          </div>
           <span className="text-sm font-bold text-gray-700">{partnerStatus?.stage.name}</span>
         </div>
       </div>
@@ -439,7 +445,7 @@ export default function Pokedex() {
                 <img
                   src={partnerStatus.stage.image}
                   alt={partnerStatus.stage.name}
-                  className="w-full h-full object-contain filter drop-shadow-md animate-bounce-slow"
+                  className="w-full h-full object-contain filter drop-shadow-md animate-bounce-slow scale-125"
                 />
               </div>
               <div className="absolute -bottom-2 w-full text-center">
@@ -622,13 +628,12 @@ export default function Pokedex() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {sortedCards.map((card) => {
             const isExpanded = expandedCard === card.id
-            
+
             return (
               <div
                 key={card.id}
-                className={`group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 relative overflow-hidden ring-4 ${
-                  isExpanded ? 'ring-pokemon-yellow' : 'ring-transparent hover:ring-pokemon-yellow'
-                }`}
+                className={`group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 relative overflow-hidden ring-4 ${isExpanded ? 'ring-pokemon-yellow' : 'ring-transparent hover:ring-pokemon-yellow'
+                  }`}
               >
                 {/* 희귀도에 따른 배경 그라데이션 */}
                 <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${getRarityColor(card.rarity)} opacity-30`}></div>
