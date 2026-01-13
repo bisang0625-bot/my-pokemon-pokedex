@@ -73,7 +73,11 @@ export default function ParentMode() {
     }
   }
 
-  const clearAllData = () => {
+  const clearAllData = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     if (confirm(translate('parentMode.deleteConfirm'))) {
       localStorage.removeItem('pokedexCards')
       localStorage.removeItem('partnerId') // 파트너 정보도 삭제하여 새로 고를 수 있게 함
@@ -203,6 +207,7 @@ export default function ParentMode() {
             </p>
           </div>
           <button
+            type="button"
             onClick={clearAllData}
             className="px-6 py-3 bg-white border-2 border-red-200 text-red-600 rounded-xl hover:bg-red-50 hover:border-red-400 transition-all font-bold shadow-sm whitespace-nowrap"
           >
