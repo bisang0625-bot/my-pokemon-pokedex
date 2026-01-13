@@ -1,8 +1,20 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
+import ErrorBoundary from './components/ErrorBoundary.jsx'
 import './index.css'
 import { runImageCompressionMigration } from './utils/pokedexUtils'
+
+// 초기화 전 localStorage 데이터 검증 (데이터 오염 방지)
+try {
+  const pokedexData = localStorage.getItem('pokedexCards');
+  if (pokedexData && !pokedexData.startsWith('[')) {
+    console.warn('Corrupted pokedex data detected, resetting...');
+    localStorage.removeItem('pokedexCards');
+  }
+} catch (e) {
+  console.error('LocalStorage validation failed:', e);
+}
 
 // 앱 초기화 시 기존 이미지 압축 마이그레이션 실행 (1회성)
 runImageCompressionMigration().catch(error => {
@@ -35,7 +47,7 @@ if ('serviceWorker' in navigator) {
     // 이미 로드된 경우 즉시 실행
     registerServiceWorker();
   }
-  
+
   // 추가 안전장치: load 이벤트도 리스닝
   window.addEventListener('load', registerServiceWorker);
 }
@@ -56,7 +68,9 @@ if (!rootElement) {
   try {
     ReactDOM.createRoot(rootElement).render(
       <React.StrictMode>
-        <App />
+        <ErrorBoundary>
+          <App />
+        </ErrorBoundary>
       </React.StrictMode>
     );
   } catch (error) {

@@ -1,5 +1,5 @@
 // Service Worker for PWA - Safari 호환성 개선
-const CACHE_NAME = 'pokemon-master-v1';
+const CACHE_NAME = 'pokemon-master-v2';
 const urlsToCache = [
   '/',
   '/index.html'
@@ -8,13 +8,13 @@ const urlsToCache = [
 self.addEventListener('install', (event) => {
   // Safari 호환성을 위해 skipWaiting 사용
   self.skipWaiting();
-  
+
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
         // Safari에서 addAll이 실패할 수 있으므로 개별적으로 추가
         return Promise.allSettled(
-          urlsToCache.map(url => 
+          urlsToCache.map(url =>
             cache.add(url).catch(err => {
               console.log(`Failed to cache ${url}:`, err);
               return null;
@@ -34,7 +34,7 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') {
     return;
   }
-  
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
