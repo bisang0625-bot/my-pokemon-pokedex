@@ -428,7 +428,7 @@ export default function Pokedex() {
             <img
               src={partnerStatus?.stage.image}
               alt={partnerStatus?.stage.name}
-              className="w-full h-full object-contain scale-125"
+              className="w-full h-full object-contain scale-150"
             />
           </div>
           <span className="text-sm font-bold text-gray-700">{partnerStatus?.stage.name}</span>
@@ -445,7 +445,7 @@ export default function Pokedex() {
                 <img
                   src={partnerStatus.stage.image}
                   alt={partnerStatus.stage.name}
-                  className="w-full h-full object-contain filter drop-shadow-md animate-bounce-slow scale-125"
+                  className="w-full h-full object-contain filter drop-shadow-md animate-bounce-slow scale-150"
                 />
               </div>
               <div className="absolute -bottom-2 w-full text-center">
