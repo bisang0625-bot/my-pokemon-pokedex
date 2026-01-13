@@ -76,6 +76,7 @@ export default function ParentMode() {
   const clearAllData = () => {
     if (confirm(translate('parentMode.deleteConfirm'))) {
       localStorage.removeItem('pokedexCards')
+      localStorage.removeItem('partnerId') // 파트너 정보도 삭제하여 새로 고를 수 있게 함
       setStats({ totalCards: 0, lastScanDate: null })
       setCardPrices([])
       setTotalValue(null)
