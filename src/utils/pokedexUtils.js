@@ -11,7 +11,7 @@ import { compressImage } from './imageUtils'
  */
 function convertTypeToEnglish(koreanType) {
   if (!koreanType) return 'normal';
-  
+
   const typeMap = {
     '불꽃': 'fire',
     '물': 'water',
@@ -32,19 +32,19 @@ function convertTypeToEnglish(koreanType) {
     '고스트': 'ghost',
     '강철': 'steel'
   };
-  
+
   // 이미 영어 코드인 경우 그대로 반환
   if (typeMap.hasOwnProperty(koreanType)) {
     return typeMap[koreanType];
   }
-  
+
   // 소문자로 변환 후 확인 (모든 포켓몬 타입)
   const lowerType = koreanType.toLowerCase();
   const allTypes = ['normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy'];
   if (allTypes.includes(lowerType)) {
     return lowerType;
   }
-  
+
   // 매칭되지 않으면 기본값 반환
   console.warn('알 수 없는 타입:', koreanType);
   return 'normal';
@@ -81,7 +81,7 @@ export function saveCardToPokedex(imageUrl, analysisResult) {
     }
 
     savedCards.push(newCard)
-    
+
     try {
       localStorage.setItem('pokedexCards', JSON.stringify(savedCards))
     } catch (storageError) {
@@ -111,10 +111,10 @@ export function saveCardToPokedex(imageUrl, analysisResult) {
 function needsCompression(imageSrc) {
   if (!imageSrc || typeof imageSrc !== 'string') return false
   if (!imageSrc.startsWith('data:image')) return false
-  
-  // base64 문자열 길이가 500KB (약 660,000자) 이상이면 압축 필요
-  // 압축된 이미지는 보통 100KB 이하 (약 130,000자)
-  return imageSrc.length > 130000
+
+  // base64 문자열 길이가 80KB (약 100,000자) 이상이면 압축 필요
+  // 새 압축 기준: 600x600, 품질 0.5로 훨씬 작은 이미지 생성
+  return imageSrc.length > 100000
 }
 
 /**
@@ -125,7 +125,7 @@ export function getCardsFromPokedex() {
   try {
     const cardsJson = localStorage.getItem('pokedexCards')
     if (!cardsJson) return []
-    
+
     const cards = JSON.parse(cardsJson)
     return Array.isArray(cards) ? cards : []
   } catch (error) {
@@ -140,27 +140,27 @@ export function getCardsFromPokedex() {
  * @returns {Promise<void>}
  */
 export async function runImageCompressionMigration() {
-  const migrationKey = 'imageCompressionMigrationDone'
+  const migrationKey = 'imageCompressionMigrationV2Done' // v2: 더 강한 압축 적용
   const migrationDone = localStorage.getItem(migrationKey) === 'true'
-  
+
   // 이미 마이그레이션이 완료되었으면 실행하지 않음
   if (migrationDone) {
     return
   }
-  
+
   try {
     const cardsJson = localStorage.getItem('pokedexCards')
     if (!cardsJson) {
       localStorage.setItem(migrationKey, 'true')
       return
     }
-    
+
     const cards = JSON.parse(cardsJson)
     if (!Array.isArray(cards) || cards.length === 0) {
       localStorage.setItem(migrationKey, 'true')
       return
     }
-    
+
     // 백그라운드에서 점진적으로 압축
     await compressExistingImages(cards, migrationKey)
   } catch (error) {
@@ -177,31 +177,31 @@ export async function runImageCompressionMigration() {
  */
 async function compressExistingImages(cards, migrationKey) {
   try {
-    const cardsToCompress = cards.filter(card => 
+    const cardsToCompress = cards.filter(card =>
       card.image && needsCompression(card.image)
     )
-    
+
     if (cardsToCompress.length === 0) {
       localStorage.setItem(migrationKey, 'true')
       return
     }
-    
+
     console.log(`압축 필요한 카드 ${cardsToCompress.length}장 발견. 백그라운드에서 압축 중...`)
-    
+
     // 한 번에 하나씩 압축하여 localStorage quota 에러 방지
     let updatedCards = [...cards]
     let compressedCount = 0
-    
+
     for (const card of cardsToCompress) {
       try {
-        const compressedImage = await compressImage(card.image, 800, 800, 0.7)
-        
+        const compressedImage = await compressImage(card.image, 600, 600, 0.5)
+
         // 카드 배열에서 해당 카드 찾아서 업데이트
         const cardIndex = updatedCards.findIndex(c => c.id === card.id)
         if (cardIndex !== -1) {
           updatedCards[cardIndex] = { ...updatedCards[cardIndex], image: compressedImage }
           compressedCount++
-          
+
           // 10장마다 저장하여 진행 상황 저장
           if (compressedCount % 10 === 0) {
             try {
@@ -213,7 +213,7 @@ async function compressExistingImages(cards, migrationKey) {
             }
           }
         }
-        
+
         // 각 압축 사이에 짧은 지연 (브라우저 블로킹 방지)
         await new Promise(resolve => setTimeout(resolve, 50))
       } catch (error) {
@@ -221,7 +221,7 @@ async function compressExistingImages(cards, migrationKey) {
         // 개별 카드 압축 실패는 무시하고 계속 진행
       }
     }
-    
+
     // 최종 저장
     try {
       localStorage.setItem('pokedexCards', JSON.stringify(updatedCards))

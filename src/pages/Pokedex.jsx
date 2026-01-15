@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { getCardsFromPokedex, deleteCardFromPokedex } from '../utils/pokedexUtils'
 import { calculateXP, getPartnerStatus } from '../utils/partnerUtils'
+import { checkStorageStatus } from '../utils/storageUtils'
 import StarterSelection from '../components/StarterSelection'
 import { useLanguage } from '../contexts/LanguageContext'
 
@@ -13,6 +14,7 @@ export default function Pokedex() {
   const [sortBy, setSortBy] = useState('latest')
   const [partnerId, setPartnerId] = useState(null)
   const [expandedCard, setExpandedCard] = useState(null)
+  const [storageInfo, setStorageInfo] = useState({ percentage: 0, used: '0 KB', max: '5 MB', isNearLimit: false, isCritical: false })
 
   useEffect(() => {
     try {
@@ -22,12 +24,16 @@ export default function Pokedex() {
       // 파트너 정보 로드
       const savedPartner = localStorage.getItem('partnerId')
       setPartnerId(savedPartner)
+
+      // 저장소 용량 체크
+      setStorageInfo(checkStorageStatus())
     } catch (error) {
       console.error('도감 데이터 로드 에러:', error)
       setCards([])
       setPartnerId(null)
     }
   }, [])
+
 
   const handleStarterSelect = (id) => {
     localStorage.setItem('partnerId', id)
@@ -497,25 +503,63 @@ export default function Pokedex() {
 
       {/* 통계 요약 */}
       {cards.length > 0 && (
-        <div className="mb-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border-2 border-blue-200">
-            <div className="text-xs font-bold text-blue-600 mb-1">{translate('pokedex.totalCards')}</div>
-            <div className="text-2xl font-black text-blue-800">{cards.length}{translate('common.cards')}</div>
+        <div className="mb-6 space-y-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border-2 border-blue-200">
+              <div className="text-xs font-bold text-blue-600 mb-1">{translate('pokedex.totalCards')}</div>
+              <div className="text-2xl font-black text-blue-800">{cards.length}{translate('common.cards')}</div>
+            </div>
+            <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-4 border-2 border-yellow-200">
+              <div className="text-xs font-bold text-yellow-600 mb-1">{translate('pokedex.legendCards')}</div>
+              <div className="text-2xl font-black text-yellow-800">{stats.legendCards}{translate('common.cards')}</div>
+            </div>
+            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 border-2 border-purple-200">
+              <div className="text-xs font-bold text-purple-600 mb-1">{translate('pokedex.ultraRareCards')}</div>
+              <div className="text-2xl font-black text-purple-800">{stats.ultraRareCards}{translate('common.cards')}</div>
+            </div>
+            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border-2 border-green-200">
+              <div className="text-xs font-bold text-green-600 mb-1">{translate('pokedex.rareCards')}</div>
+              <div className="text-2xl font-black text-green-800">{stats.rareCards}{translate('common.cards')}</div>
+            </div>
           </div>
-          <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-4 border-2 border-yellow-200">
-            <div className="text-xs font-bold text-yellow-600 mb-1">{translate('pokedex.legendCards')}</div>
-            <div className="text-2xl font-black text-yellow-800">{stats.legendCards}{translate('common.cards')}</div>
-          </div>
-          <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 border-2 border-purple-200">
-            <div className="text-xs font-bold text-purple-600 mb-1">{translate('pokedex.ultraRareCards')}</div>
-            <div className="text-2xl font-black text-purple-800">{stats.ultraRareCards}{translate('common.cards')}</div>
-          </div>
-          <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border-2 border-green-200">
-            <div className="text-xs font-bold text-green-600 mb-1">{translate('pokedex.rareCards')}</div>
-            <div className="text-2xl font-black text-green-800">{stats.rareCards}{translate('common.cards')}</div>
+
+          {/* 저장소 용량 표시 */}
+          <div className={`rounded-xl p-3 border-2 ${storageInfo.isCritical ? 'bg-red-50 border-red-200' :
+              storageInfo.isNearLimit ? 'bg-yellow-50 border-yellow-200' :
+                'bg-gray-50 border-gray-200'
+            }`}>
+            <div className="flex justify-between items-center mb-2">
+              <span className={`text-xs font-bold ${storageInfo.isCritical ? 'text-red-600' :
+                  storageInfo.isNearLimit ? 'text-yellow-600' :
+                    'text-gray-600'
+                }`}>
+                💾 {language === 'ko' ? '저장 공간' : language === 'nl' ? 'Opslagruimte' : 'Storage'}
+              </span>
+              <span className={`text-xs font-bold ${storageInfo.isCritical ? 'text-red-700' :
+                  storageInfo.isNearLimit ? 'text-yellow-700' :
+                    'text-gray-700'
+                }`}>
+                {storageInfo.used} / {storageInfo.max} ({storageInfo.percentage}%)
+              </span>
+            </div>
+            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div
+                className={`h-full transition-all duration-500 ${storageInfo.isCritical ? 'bg-red-500' :
+                    storageInfo.isNearLimit ? 'bg-yellow-500' :
+                      'bg-green-500'
+                  }`}
+                style={{ width: `${storageInfo.percentage}%` }}
+              />
+            </div>
+            {storageInfo.isCritical && (
+              <p className="text-xs text-red-600 mt-2 font-medium">
+                ⚠️ {language === 'ko' ? '저장 공간이 거의 가득 찼어요! 부모 모드에서 카드를 삭제해주세요.' : language === 'nl' ? 'Opslagruimte bijna vol! Verwijder kaarten in Ouder Modus.' : 'Storage almost full! Delete cards in Parent Mode.'}
+              </p>
+            )}
           </div>
         </div>
       )}
+
 
       {/* 검색 및 필터 */}
       <div className="mb-8 space-y-4">
