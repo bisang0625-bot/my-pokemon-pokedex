@@ -1,5 +1,5 @@
 // Service Worker for PWA - Safari 호환성 개선
-const CACHE_NAME = 'pokemon-master-v2';
+const CACHE_NAME = 'pokemon-master-v3'; // v3: 네트워크 우선 전략 적용
 const urlsToCache = [
   '/',
   '/index.html'
@@ -35,6 +35,30 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // CRITICAL FIX: Network-First for HTML navigation
+  // 이렇게 하면 항상 최신 index.html을 가져와서 올바른 JS/CSS 파일을 참조함
+  if (event.request.mode === 'navigate' || event.request.destination === 'document') {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          // 네트워크 응답을 캐시에 저장 (오프라인 대비)
+          if (response && response.status === 200) {
+            const responseClone = response.clone();
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(event.request, responseClone);
+            });
+          }
+          return response;
+        })
+        .catch(() => {
+          // 오프라인일 때만 캐시 사용
+          return caches.match(event.request);
+        })
+    );
+    return;
+  }
+
+  // Cache-First for other assets (CSS, JS, images) - 성능 최적화
   event.respondWith(
     caches.match(event.request)
       .then((response) => {

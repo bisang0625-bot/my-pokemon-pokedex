@@ -7,31 +7,24 @@
   "background_color": "#ef4444",
   "theme_color": "#ef4444",
   "orientation": "portrait",
-  "icons": [
-    {
-      "src": "/vite.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    }
+  "icons": [],
+  "categories": [
+    "games",
+    "education"
   ],
-  "categories": ["games", "education"],
   "screenshots": [],
   "shortcuts": [
     {
       "name": "카드 스캔",
       "short_name": "스캔",
       "description": "몬스터 카드를 스캔합니다",
-      "url": "/",
-      "icons": [{ "src": "/vite.svg", "sizes": "any", "type": "image/svg+xml" }]
+      "url": "/"
     },
     {
       "name": "도감 보기",
       "short_name": "도감",
       "description": "수집한 몬스터를 확인합니다",
-      "url": "/pokedex",
-      "icons": [{ "src": "/vite.svg", "sizes": "any", "type": "image/svg+xml" }]
+      "url": "/pokedex"
     }
   ]
 }
-

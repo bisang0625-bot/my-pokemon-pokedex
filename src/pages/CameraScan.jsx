@@ -24,7 +24,7 @@ export default function CameraScan() {
   const capture = useCallback(async () => {
     if (webcamRef.current) {
       const originalImageSrc = webcamRef.current.getScreenshot()
-      
+
       try {
         // 이미지 압축 (최대 800x800, 품질 70%)
         const compressedImageSrc = await compressImage(originalImageSrc, 800, 800, 0.7)
@@ -34,7 +34,7 @@ export default function CameraScan() {
         // 압축 실패 시 원본 사용
         setCapturedImage(originalImageSrc)
       }
-      
+
       setIsScanning(false)
     }
   }, [webcamRef])
@@ -74,25 +74,25 @@ export default function CameraScan() {
       const blob = await response.blob()
 
       const result = await analyzeCard(blob)
-      
+
       // 추가 검증: 결과가 유효한지 확인
       if (!result || !result.name || !result.hp || !result.type) {
         throw new Error('몬스터 카드 정보를 올바르게 읽을 수 없습니다. 카드를 명확하게 스캔해주세요.')
       }
-      
+
       setAnalysisResult(result)
       saveCardToPokedex(capturedImage, result)
     } catch (err) {
       let errorMessage = err.message || '카드 분석 중 오류가 발생했습니다.'
-      
+
       // localStorage quota exceeded 에러 처리
       if (err.message === 'STORAGE_QUOTA_EXCEEDED') {
         errorMessage = translate('cameraScan.storageQuotaExceeded')
       }
-      
+
       setError(errorMessage)
       console.error('분석 오류:', err)
-      
+
       // 몬스터 카드가 아닌 경우, 분석 결과를 초기화하고 다시 찍을 수 있도록 함
       setAnalysisResult(null)
     } finally {
@@ -110,7 +110,7 @@ export default function CameraScan() {
   // 타입을 영어 코드로 정규화하는 함수 (한국어/영어 모두 처리) - 모든 타입 지원
   const normalizeType = (type) => {
     if (!type) return 'normal';
-    
+
     const koreanToEnglish = {
       '노말': 'normal', '불꽃': 'fire', '물': 'water', '전기': 'electric',
       '풀': 'grass', '얼음': 'ice', '격투': 'fighting', '독': 'poison',
@@ -118,19 +118,19 @@ export default function CameraScan() {
       '바위': 'rock', '고스트': 'ghost', '드래곤': 'dragon', '악': 'dark',
       '강철': 'steel', '페어리': 'fairy'
     };
-    
+
     // 한국어 타입이면 영어로 변환
     if (koreanToEnglish[type]) {
       return koreanToEnglish[type];
     }
-    
+
     // 이미 영어 코드인 경우 - 모든 포켓몬 타입 지원
     const lowerType = type.toLowerCase();
     const allTypes = ['normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy'];
     if (allTypes.includes(lowerType)) {
       return lowerType;
     }
-    
+
     return 'normal';
   }
 
@@ -142,7 +142,7 @@ export default function CameraScan() {
   const getTypeColor = (type) => {
     const englishType = normalizeType(type);
     const colorMap = {
-      normal: 'bg-gray-400', fire: 'bg-red-500', water: 'bg-blue-500', 
+      normal: 'bg-gray-400', fire: 'bg-red-500', water: 'bg-blue-500',
       electric: 'bg-yellow-400', grass: 'bg-green-500', ice: 'bg-cyan-300',
       fighting: 'bg-red-700', poison: 'bg-purple-500', ground: 'bg-yellow-700',
       flying: 'bg-indigo-300', psychic: 'bg-pink-500', bug: 'bg-green-600',
@@ -184,7 +184,7 @@ export default function CameraScan() {
         <div className="absolute top-1/2 left-1/2 w-4 h-[2px] bg-white/50 -translate-x-1/2 -translate-y-1/2"></div>
         <div className="absolute top-1/2 left-1/2 w-[2px] h-4 bg-white/50 -translate-x-1/2 -translate-y-1/2"></div>
 
-        <div className="absolute -bottom-8 left-0 right-0 text-center text-white font-bold text-shadow">
+        <div className="absolute -top-10 left-0 right-0 text-center text-white font-bold text-shadow">
           {translate('cameraScan.cardInFrame')}
         </div>
       </div>
@@ -286,48 +286,45 @@ export default function CameraScan() {
             {isAnalyzing ? (
               <div className="bg-white rounded-2xl p-6 sm:p-8 text-center shadow-lg border-2 border-pokemon-yellow animate-pulse">
                 <div className="text-4xl mb-4 animate-spin-slow inline-block">⏳</div>
-                 <h3 className="text-xl font-bold text-gray-800 mb-2">{translate('cameraScan.analyzing')}</h3>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">{translate('cameraScan.analyzing')}</h3>
                 <p className="text-gray-500">{translate('cameraScan.analyzingSub')}</p>
               </div>
             ) : (
               !analysisResult && (
                 <div className="flex flex-col gap-3 max-w-sm mx-auto w-full px-4 sm:px-0">
-                {error && (
-                  <div className={`border-2 rounded-xl p-4 mb-2 ${
-                    error.includes('할당량') || error.includes('quota') || error.includes('저장 공간') || error.includes('Storage') || error.includes('Opslagruimte')
-                      ? 'bg-yellow-50 border-yellow-200' 
-                      : 'bg-red-50 border-red-200'
-                  }`}>
-                    <div className="flex items-start gap-2">
-                      <span className="text-2xl">{error.includes('할당량') || error.includes('저장 공간') || error.includes('Storage') || error.includes('Opslagruimte') ? '💾' : '⚠️'}</span>
-                      <div className="flex-1">
-                        <h4 className={`font-bold mb-1 ${
-                          error.includes('할당량') || error.includes('quota') || error.includes('저장 공간') || error.includes('Storage') || error.includes('Opslagruimte')
-                            ? 'text-yellow-700' 
-                            : 'text-red-700'
-                        }`}>
-                          {error.includes('저장 공간') || error.includes('Storage') || error.includes('Opslagruimte') 
-                            ? translate('cameraScan.storageQuotaExceededTitle')
-                            : error.includes('할당량') || error.includes('quota') 
-                              ? translate('cameraScan.quotaExceededTitle') 
-                              : translate('cameraScan.analysisFailed')}
-                        </h4>
-                        <p className={`text-sm ${
-                          error.includes('할당량') || error.includes('quota') || error.includes('저장 공간') || error.includes('Storage') || error.includes('Opslagruimte')
-                            ? 'text-yellow-600' 
-                            : 'text-red-600'
-                        }`}>
-                          {error}
-                        </p>
-                        {!error.includes('할당량') && !error.includes('quota') && !error.includes('저장 공간') && !error.includes('Storage') && !error.includes('Opslagruimte') && (
-                          <p className="text-xs text-red-500 mt-2">
-                             {translate('cameraScan.scanTip')}
+                  {error && (
+                    <div className={`border-2 rounded-xl p-4 mb-2 ${error.includes('할당량') || error.includes('quota') || error.includes('저장 공간') || error.includes('Storage') || error.includes('Opslagruimte')
+                        ? 'bg-yellow-50 border-yellow-200'
+                        : 'bg-red-50 border-red-200'
+                      }`}>
+                      <div className="flex items-start gap-2">
+                        <span className="text-2xl">{error.includes('할당량') || error.includes('저장 공간') || error.includes('Storage') || error.includes('Opslagruimte') ? '💾' : '⚠️'}</span>
+                        <div className="flex-1">
+                          <h4 className={`font-bold mb-1 ${error.includes('할당량') || error.includes('quota') || error.includes('저장 공간') || error.includes('Storage') || error.includes('Opslagruimte')
+                              ? 'text-yellow-700'
+                              : 'text-red-700'
+                            }`}>
+                            {error.includes('저장 공간') || error.includes('Storage') || error.includes('Opslagruimte')
+                              ? translate('cameraScan.storageQuotaExceededTitle')
+                              : error.includes('할당량') || error.includes('quota')
+                                ? translate('cameraScan.quotaExceededTitle')
+                                : translate('cameraScan.analysisFailed')}
+                          </h4>
+                          <p className={`text-sm ${error.includes('할당량') || error.includes('quota') || error.includes('저장 공간') || error.includes('Storage') || error.includes('Opslagruimte')
+                              ? 'text-yellow-600'
+                              : 'text-red-600'
+                            }`}>
+                            {error}
                           </p>
-                        )}
+                          {!error.includes('할당량') && !error.includes('quota') && !error.includes('저장 공간') && !error.includes('Storage') && !error.includes('Opslagruimte') && (
+                            <p className="text-xs text-red-500 mt-2">
+                              {translate('cameraScan.scanTip')}
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
                   <button
                     onClick={analyzeImage}
                     className="w-full py-4 bg-gradient-to-r from-pokemon-blue to-blue-600 text-white rounded-2xl font-black text-xl shadow-lg hover:scale-105 transition-transform flex items-center justify-center gap-2"
