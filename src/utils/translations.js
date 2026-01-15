@@ -8,7 +8,7 @@ export const translations = {
     appName: '포켓 카드 헌터',
     appNameFull: '포켓 카드 헌터: 몬스터 키우기',
     appDescription: '7-10세 아이들을 위한 몬스터 카드 수집 및 도감 앱. 카드를 스캔하고 자신만의 도감을 만들어보세요!',
-    
+
     // 네비게이션
     nav: {
       scan: '스캔',
@@ -19,7 +19,7 @@ export const translations = {
       terms: '이용약관',
       language: '언어'
     },
-    
+
     // Pokedex 페이지
     pokedex: {
       title: '내 몬스터 도감',
@@ -55,7 +55,7 @@ export const translations = {
       rareCardsHint: '* 희귀한 카드를 모으면 더 빨리 성장해요! (현재 레벨: {level})',
       finalEvolution: '🏆 최종 진화 완료! 정말 대단해요!'
     },
-    
+
     // 타입 이름
     types: {
       all: '전체',
@@ -78,7 +78,7 @@ export const translations = {
       steel: '강철',
       fairy: '페어리'
     },
-    
+
     // 희귀도 설명
     rarity: {
       5: '👑 전설의 카드예요! 정말 특별해요!',
@@ -87,7 +87,7 @@ export const translations = {
       2: '⭐ 보통 카드예요! 괜찮은 카드예요!',
       1: '🔸 일반 카드예요! 기본 카드예요!'
     },
-    
+
     // CameraScan 페이지
     cameraScan: {
       title: '카드 스캔',
@@ -109,7 +109,7 @@ export const translations = {
       storageQuotaExceededTitle: '저장 공간 부족',
       analysisFailed: '분석 실패'
     },
-    
+
     // StarterSelection 컴포넌트
     starterSelection: {
       title: '파트너 몬스터를 선택하세요!',
@@ -117,7 +117,7 @@ export const translations = {
       selectButton: '선택하기',
       evolutionHint: '* 카드를 많이 모으면 몬스터가 진화합니다!'
     },
-    
+
     // 공통
     common: {
       hp: 'HP',
@@ -125,7 +125,7 @@ export const translations = {
       cards: '장',
       level: '레벨'
     },
-    
+
     // ParentalGate 컴포넌트
     parentalGate: {
       newPassword: '새로운 보호자 비밀번호 설정',
@@ -145,7 +145,7 @@ export const translations = {
       cancel: '취소',
       confirm: '확인'
     },
-    
+
     // ParentMode 페이지
     parentMode: {
       title: '부모님 설정',
@@ -170,7 +170,7 @@ export const translations = {
       deleteConfirm: '모든 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.',
       deleteSuccess: '모든 데이터가 삭제되었습니다.'
     },
-    
+
     // 파트너 포켓몬 이름
     partners: {
       fire: {
@@ -198,7 +198,7 @@ export const translations = {
         }
       }
     },
-    
+
     // 개인정보 처리방침
     privacy: {
       title: '개인정보 처리방침',
@@ -231,9 +231,9 @@ export const translations = {
       section8Title: '8. 개인정보 처리방침 변경',
       section8Desc: '이 개인정보 처리방침은 2024년 1월 1일부터 시행됩니다. 법령 및 방침에 따른 변경내용의 추가, 삭제 및 정정이 있는 경우에는 변경사항의 시행 7일 전부터 앱 내 공지사항을 통하여 고지할 것입니다.',
       contactTitle: '문의처',
-      contactDesc: '개인정보 처리방침에 관한 문의사항이 있으시면 앱 리뷰를 통해 문의해 주시기 바랍니다.'
+      contactDesc: '개인정보 처리방침에 관한 문의사항이 있으시면 bisang0625@gmail.com으로 문의해 주시기 바랍니다.'
     },
-    
+
     // 이용약관
     terms: {
       title: '이용약관',
@@ -276,12 +276,12 @@ export const translations = {
       supplementDesc: '본 약관은 2024년 1월 1일부터 시행됩니다.'
     }
   },
-  
+
   en: {
     appName: 'Pocket Card Hunter',
     appNameFull: 'Pocket Card Hunter: Monster Raising',
     appDescription: 'Monster card collection and Pokedex app for kids aged 7-10. Scan cards and create your own Pokedex!',
-    
+
     nav: {
       scan: 'Scan',
       pokedex: 'Pokedex',
@@ -291,7 +291,7 @@ export const translations = {
       terms: 'Terms of Service',
       language: 'Language'
     },
-    
+
     pokedex: {
       title: 'My Monster Pokedex',
       searchPlaceholder: 'Search monster name or nickname...',
@@ -326,7 +326,7 @@ export const translations = {
       rareCardsHint: '* Collect rare cards to grow faster! (Current Level: {level})',
       finalEvolution: '🏆 Final Evolution Complete! Amazing!'
     },
-    
+
     types: {
       all: 'All',
       normal: 'Normal',
@@ -348,7 +348,7 @@ export const translations = {
       steel: 'Steel',
       fairy: 'Fairy'
     },
-    
+
     rarity: {
       5: '👑 Legendary Card! So special!',
       4: '💎 Ultra Rare Card! Extremely rare!',
@@ -356,7 +356,7 @@ export const translations = {
       2: '⭐ Common Card! Nice card!',
       1: '🔸 Basic Card! Standard card!'
     },
-    
+
     cameraScan: {
       title: 'Card Scan',
       startCamera: 'Start Camera',
@@ -377,21 +377,21 @@ export const translations = {
       storageQuotaExceededTitle: 'Storage Full',
       analysisFailed: 'Analysis Failed'
     },
-    
+
     starterSelection: {
       title: 'Choose Your Partner Monster!',
       subtitle: 'Pick a friend to go on adventures with.',
       selectButton: 'Select',
       evolutionHint: '* Collect more cards to evolve your monster!'
     },
-    
+
     common: {
       hp: 'HP',
       power: '⚡',
       cards: ' cards',
       level: 'Level'
     },
-    
+
     // ParentalGate component
     parentalGate: {
       newPassword: 'Set New Guardian Password',
@@ -411,7 +411,7 @@ export const translations = {
       cancel: 'Cancel',
       confirm: 'Confirm'
     },
-    
+
     // ParentMode page
     parentMode: {
       title: 'Parent Settings',
@@ -436,7 +436,7 @@ export const translations = {
       deleteConfirm: 'Are you sure you want to delete all data? This action cannot be undone.',
       deleteSuccess: 'All data has been deleted.'
     },
-    
+
     // Partner monster names
     partners: {
       fire: {
@@ -464,7 +464,7 @@ export const translations = {
         }
       }
     },
-    
+
     // Privacy Policy
     privacy: {
       title: 'Privacy Policy',
@@ -497,9 +497,9 @@ export const translations = {
       section8Title: '8. Changes to Privacy Policy',
       section8Desc: 'This privacy policy takes effect from January 1, 2024. In case of additions, deletions, or corrections due to laws and policies, notice will be given through in-app announcements 7 days before the implementation of changes.',
       contactTitle: 'Contact',
-      contactDesc: 'If you have any questions about this privacy policy, please contact us through app reviews.'
+      contactDesc: 'If you have any questions about this privacy policy, please contact us at bisang0625@gmail.com.'
     },
-    
+
     // Terms of Service
     terms: {
       title: 'Terms of Service',
@@ -542,12 +542,12 @@ export const translations = {
       supplementDesc: 'These terms take effect from January 1, 2024.'
     }
   },
-  
+
   nl: {
     appName: 'Pocket Kaart Jager',
     appNameFull: 'Pocket Kaart Jager: Monster Opvoeding',
     appDescription: 'Monsterkaart verzamel- en Pokedex-app voor kinderen van 7-10 jaar. Scan kaarten en maak je eigen Pokedex!',
-    
+
     nav: {
       scan: 'Scan',
       pokedex: 'Pokedex',
@@ -557,7 +557,7 @@ export const translations = {
       terms: 'Servicevoorwaarden',
       language: 'Taal'
     },
-    
+
     pokedex: {
       title: 'Mijn Monster Pokedex',
       searchPlaceholder: 'Zoek monsternaam of bijnaam...',
@@ -592,7 +592,7 @@ export const translations = {
       rareCardsHint: '* Verzamel zeldzame kaarten om sneller te groeien! (Huidig Niveau: {level})',
       finalEvolution: '🏆 Laatste Evolutie Voltooid! Geweldig!'
     },
-    
+
     types: {
       all: 'Alle',
       normal: 'Normaal',
@@ -614,7 +614,7 @@ export const translations = {
       steel: 'Staal',
       fairy: 'Fee'
     },
-    
+
     rarity: {
       5: '👑 Legendarische Kaart! Zo speciaal!',
       4: '💎 Ultra Zeldzame Kaart! Extreem zeldzaam!',
@@ -622,7 +622,7 @@ export const translations = {
       2: '⭐ Gewone Kaart! Mooie kaart!',
       1: '🔸 Basis Kaart! Standaard kaart!'
     },
-    
+
     cameraScan: {
       title: 'Kaart Scannen',
       startCamera: 'Camera Starten',
@@ -643,21 +643,21 @@ export const translations = {
       storageQuotaExceededTitle: 'Opslagruimte Vol',
       analysisFailed: 'Analyse Mislukt'
     },
-    
+
     starterSelection: {
       title: 'Kies Je Partnermonster!',
       subtitle: 'Kies een vriend om avonturen mee te beleven.',
       selectButton: 'Selecteren',
       evolutionHint: '* Verzamel meer kaarten om je monster te evolueren!'
     },
-    
+
     common: {
       hp: 'HP',
       power: '⚡',
       cards: ' kaarten',
       level: 'Niveau'
     },
-    
+
     // ParentalGate component
     parentalGate: {
       newPassword: 'Nieuw Beveiligingswachtwoord Instellen',
@@ -677,7 +677,7 @@ export const translations = {
       cancel: 'Annuleren',
       confirm: 'Bevestigen'
     },
-    
+
     // ParentMode page
     parentMode: {
       title: 'Ouder Instellingen',
@@ -702,7 +702,7 @@ export const translations = {
       deleteConfirm: 'Weet u zeker dat u alle gegevens wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.',
       deleteSuccess: 'Alle gegevens zijn verwijderd.'
     },
-    
+
     // Partner monster names
     partners: {
       fire: {
@@ -730,7 +730,7 @@ export const translations = {
         }
       }
     },
-    
+
     // Privacy Policy
     privacy: {
       title: 'Privacybeleid',
@@ -763,9 +763,9 @@ export const translations = {
       section8Title: '8. Wijzigingen in Privacybeleid',
       section8Desc: 'Dit privacybeleid treedt in werking vanaf 1 januari 2024. In geval van toevoegingen, verwijderingen of correcties als gevolg van wetten en beleid, wordt 7 dagen voor de uitvoering van wijzigingen kennisgeving gedaan via mededelingen in de app.',
       contactTitle: 'Contact',
-      contactDesc: 'Als u vragen heeft over dit privacybeleid, neem dan contact met ons op via app-beoordelingen.'
+      contactDesc: 'Als u vragen heeft over dit privacybeleid, neem dan contact met ons op via bisang0625@gmail.com.'
     },
-    
+
     // Terms of Service
     terms: {
       title: 'Servicevoorwaarden',
@@ -823,12 +823,12 @@ export const defaultLanguage = 'ko';
 // 텍스트 치환 함수 (내부 사용)
 export function translateText(text, params = {}) {
   if (!text) return '';
-  
+
   let result = text;
   Object.keys(params).forEach(key => {
     const regex = new RegExp(`\\{${key}\\}`, 'g');
     result = result.replace(regex, params[key]);
   });
-  
+
   return result;
 }

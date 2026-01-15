@@ -22,8 +22,8 @@ export async function getRealCardPrice(card) {
         error: 'API 키가 설정되지 않았습니다.'
       };
     }
-    
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
+
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `포켓몬 카드 시세 정보를 제공해주세요. 
 카드 정보: 이름 ${card.name}, HP ${card.hp}, 타입 ${card.type}, 희귀도 ${card.rarity}성. 
@@ -66,7 +66,7 @@ export function estimateCardPrice(card) {
   const hpMultiplier = 1 + (card.hp || 0) / 500;
   const powerMultiplier = 1 + ((card.powerLevel || 50) / 200);
   let estimatedPrice = Math.round(basePrice * hpMultiplier * powerMultiplier);
-  
+
   // 비공식/위조 카드는 가치를 매우 낮게 산정 (10% 수준)
   // _isOfficial는 내부 전용 필드로 UI에는 표시되지 않음
   if (card._isOfficial === false) {
@@ -74,12 +74,12 @@ export function estimateCardPrice(card) {
     // 최소 가치는 100원으로 유지 (너무 낮으면 이상함)
     estimatedPrice = Math.max(estimatedPrice, 100);
   }
-  
+
   return {
-    estimated: estimatedPrice, 
-    min: Math.round(estimatedPrice * 0.7), 
+    estimated: estimatedPrice,
+    min: Math.round(estimatedPrice * 0.7),
     max: Math.round(estimatedPrice * 1.5),
-    currency: 'KRW', 
+    currency: 'KRW',
     lastUpdated: new Date().toISOString()
   };
 }
@@ -105,7 +105,7 @@ export function formatPrice(price, language = 'ko') {
   let currency = 'KRW';
   let locale = 'ko-KR';
   let convertedPrice = price; // 원화 기준 가격
-  
+
   if (language === 'en') {
     currency = 'USD';
     locale = 'en-US';
@@ -115,10 +115,10 @@ export function formatPrice(price, language = 'ko') {
     locale = 'nl-NL';
     convertedPrice = Math.round(price / EXCHANGE_RATES.EUR);
   }
-  
-  return new Intl.NumberFormat(locale, { 
-    style: 'currency', 
-    currency: currency, 
-    maximumFractionDigits: 0 
+
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: currency,
+    maximumFractionDigits: 0
   }).format(convertedPrice);
 }
