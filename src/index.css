@@ -11,7 +11,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: #f0f4f8;
   /* Softer background */
-  padding-top: env(safe-area-inset-top);
+  /* safe-area-inset는 Layout 컴포넌트에서 처리 */
 }
 
 #root {
