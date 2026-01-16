@@ -82,9 +82,12 @@ export default function Layout({ children }) {
       {/* Mobile Top Bar (Logo Only) */}
       <div 
         className="bg-pokemon-red text-white shadow-lg pb-4 px-4 sm:hidden sticky top-0 z-50 rounded-b-3xl border-b-4 border-red-700"
-        style={{ paddingTop: `max(env(safe-area-inset-top, 0px), 20px)` }}
+        style={{ 
+          paddingTop: `calc(env(safe-area-inset-top, 0px) + 24px)`,
+          minHeight: `calc(env(safe-area-inset-top, 0px) + 68px)`
+        }}
       >
-        <div className="flex justify-between items-center relative min-h-[44px]">
+        <div className="flex justify-between items-center relative min-h-[44px] mt-1">
           <Link to="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-white rounded-full border-4 border-pokemon-dark flex items-center justify-center shadow-inner overflow-hidden relative animate-spin-slow">
               <div className="absolute top-1/2 w-full h-1 bg-pokemon-dark"></div>
