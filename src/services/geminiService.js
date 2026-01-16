@@ -19,8 +19,8 @@ export async function analyzeCard(imageBlob) {
       throw new Error('API 키가 설정되지 않았습니다. 부모 모드에서 API 키를 설정해주세요.');
     }
 
-    // gemini-flash-latest 모델을 사용합니다. (가장 안정적인 최신 버전 별칭 사용)
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // gemini-2.0-flash-exp 모델을 사용합니다. (현재 환경에서 작동 확인된 모델)
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
     const base64Data = await blobToBase64(imageBlob);
 
@@ -137,8 +137,8 @@ export async function analyzeCard(imageBlob) {
     }
 
     // 네트워크 에러 처리
-    if (error.message.includes("fetch") || error.message.includes("network")) {
-      throw new Error("인터넷 연결을 확인해주세요. 네트워크 오류가 발생했습니다.");
+    if (error.message.includes("fetch") || error.message.includes("network") || error.name === "TypeError") {
+      throw new Error(`인터넷 연결을 확인해주세요. (네트워크 오류: ${error.message})`);
     }
 
     // 기타 에러

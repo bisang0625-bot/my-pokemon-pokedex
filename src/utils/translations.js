@@ -231,7 +231,7 @@ export const translations = {
       section8Title: '8. 개인정보 처리방침 변경',
       section8Desc: '이 개인정보 처리방침은 2024년 1월 1일부터 시행됩니다. 법령 및 방침에 따른 변경내용의 추가, 삭제 및 정정이 있는 경우에는 변경사항의 시행 7일 전부터 앱 내 공지사항을 통하여 고지할 것입니다.',
       contactTitle: '문의처',
-      contactDesc: '개인정보 처리방침에 관한 문의사항이 있으시면 bisang0625@gmail.com으로 문의해 주시기 바랍니다.'
+      contactDesc: '개인정보 처리방침에 관한 문의사항이 있으시면 vennaper@gmail.com으로 문의해 주시기 바랍니다.'
     },
 
     // 이용약관
@@ -497,7 +497,7 @@ export const translations = {
       section8Title: '8. Changes to Privacy Policy',
       section8Desc: 'This privacy policy takes effect from January 1, 2024. In case of additions, deletions, or corrections due to laws and policies, notice will be given through in-app announcements 7 days before the implementation of changes.',
       contactTitle: 'Contact',
-      contactDesc: 'If you have any questions about this privacy policy, please contact us at bisang0625@gmail.com.'
+      contactDesc: 'If you have any questions about this privacy policy, please contact us at vennaper@gmail.com.'
     },
 
     // Terms of Service
@@ -763,7 +763,7 @@ export const translations = {
       section8Title: '8. Wijzigingen in Privacybeleid',
       section8Desc: 'Dit privacybeleid treedt in werking vanaf 1 januari 2024. In geval van toevoegingen, verwijderingen of correcties als gevolg van wetten en beleid, wordt 7 dagen voor de uitvoering van wijzigingen kennisgeving gedaan via mededelingen in de app.',
       contactTitle: 'Contact',
-      contactDesc: 'Als u vragen heeft over dit privacybeleid, neem dan contact met ons op via bisang0625@gmail.com.'
+      contactDesc: 'Als u vragen heeft over dit privacybeleid, neem dan contact met ons op via vennaper@gmail.com.'
     },
 
     // Terms of Service

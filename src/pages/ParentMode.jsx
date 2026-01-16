@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { getCardsFromPokedex } from '../utils/pokedexUtils'
 import { calculateTotalValue, estimateCardPrice, formatPrice, getRealCardPrice } from '../services/priceService'
 import ParentalGate from '../components/ParentalGate'
@@ -213,6 +214,12 @@ export default function ParentMode() {
           >
             {translate('parentMode.deleteData')}
           </button>
+        </div>
+
+        {/* 법적 고지 링크 */}
+        <div className="mt-8 pt-6 border-t border-gray-100 flex justify-center gap-6 text-xs text-gray-400">
+          <Link to="/privacy" className="hover:text-pokemon-blue transition-colors underline decoration-dotted">{translate('nav.privacy')}</Link>
+          <Link to="/terms" className="hover:text-pokemon-blue transition-colors underline decoration-dotted">{translate('nav.terms')}</Link>
         </div>
       </div>
     </div>

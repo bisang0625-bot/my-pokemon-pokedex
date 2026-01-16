@@ -47,7 +47,7 @@ export default function Layout({ children }) {
               <Link to="/" className="hover:text-pokemon-yellow font-bold transition-colors">{translate('nav.scan')}</Link>
               <Link to="/pokedex" className="hover:text-pokemon-yellow font-bold transition-colors">{translate('nav.pokedex')}</Link>
               <Link to="/parent" className="hover:text-pokemon-yellow font-bold transition-colors">{translate('nav.parentMode')}</Link>
-              
+
               {/* 언어 선택 */}
               <div className="relative group">
                 <button className="flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-white/10 transition-colors text-sm">
@@ -59,9 +59,8 @@ export default function Layout({ children }) {
                     <button
                       key={lang.code}
                       onClick={() => changeLanguage(lang.code)}
-                      className={`w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors first:rounded-t-lg last:rounded-b-lg flex items-center gap-2 ${
-                        language === lang.code ? 'bg-pokemon-blue/10 font-bold text-pokemon-blue' : 'text-gray-700'
-                      }`}
+                      className={`w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors first:rounded-t-lg last:rounded-b-lg flex items-center gap-2 ${language === lang.code ? 'bg-pokemon-blue/10 font-bold text-pokemon-blue' : 'text-gray-700'
+                        }`}
                     >
                       <span>{lang.flag}</span>
                       <span className="text-sm">{lang.name}</span>
@@ -69,7 +68,7 @@ export default function Layout({ children }) {
                   ))}
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-3 text-xs text-pokemon-yellow/80">
                 <Link to="/privacy" className="hover:text-pokemon-yellow transition-colors">{translate('nav.privacy')}</Link>
                 <span>|</span>
@@ -81,7 +80,7 @@ export default function Layout({ children }) {
       </nav>
 
       {/* Mobile Top Bar (Logo Only) */}
-      <div className="bg-pokemon-red text-white shadow-lg py-3 px-4 sm:hidden sticky top-0 z-50 rounded-b-3xl border-b-4 border-red-700">
+      <div className="bg-pokemon-red text-white shadow-lg pt-[env(safe-area-inset-top)] pb-4 px-4 sm:hidden sticky top-0 z-50 rounded-b-3xl border-b-4 border-red-700">
         <div className="flex justify-between items-center relative">
           <Link to="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-white rounded-full border-4 border-pokemon-dark flex items-center justify-center shadow-inner overflow-hidden relative animate-spin-slow">
@@ -92,25 +91,29 @@ export default function Layout({ children }) {
               <span className="text-pokemon-yellow drop-shadow-md">{translate('appName')}</span>
             </h1>
           </Link>
-          
+
           {/* 모바일 언어 선택 */}
           <div className="relative group">
             <button className="flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-white/10 transition-colors text-xs">
               <span>{languages.find(l => l.code === language)?.flag || '🌐'}</span>
             </button>
-            <div className="absolute right-0 top-full mt-2 bg-white rounded-lg shadow-xl border-2 border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 min-w-[100px]">
+            <div className="absolute right-0 top-full mt-2 bg-white rounded-lg shadow-xl border-2 border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 min-w-[120px]">
               {languages.map(lang => (
                 <button
                   key={lang.code}
                   onClick={() => changeLanguage(lang.code)}
-                  className={`w-full text-left px-3 py-2 hover:bg-gray-100 transition-colors first:rounded-t-lg last:rounded-b-lg flex items-center gap-2 ${
-                    language === lang.code ? 'bg-pokemon-blue/10 font-bold text-pokemon-blue' : 'text-gray-700'
-                  }`}
+                  className={`w-full text-left px-3 py-2 hover:bg-gray-100 transition-colors first:rounded-t-lg last:rounded-b-lg flex items-center gap-2 ${language === lang.code ? 'bg-pokemon-blue/10 font-bold text-pokemon-blue' : 'text-gray-700'
+                    }`}
                 >
                   <span>{lang.flag}</span>
                   <span className="text-xs">{lang.name}</span>
                 </button>
               ))}
+              <div className="border-t border-gray-100 mt-1 pt-1">
+                <Link to="/privacy" className="block w-full text-left px-3 py-2 text-[10px] text-gray-400 hover:text-pokemon-blue transition-colors">
+                  {translate('nav.privacy')}
+                </Link>
+              </div>
             </div>
           </div>
         </div>
