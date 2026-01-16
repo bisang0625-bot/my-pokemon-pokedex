@@ -62,10 +62,12 @@ export async function saveCardToPokedex(imageUrl, analysisResult) {
     // 타입을 영어 코드로 변환
     const typeEnglish = convertTypeToEnglish(analysisResult.type);
 
-    // 저장 전 이미지 압축 강화 (200장 저장 목표)
+    // 저장용 이미지는 이미 CameraScan에서 압축되어 전달됨
+    // 추가 압축이 필요한 경우에만 수행 (이미 압축된 이미지는 그대로 사용)
     let finalImageUrl = imageUrl
     if (imageUrl && imageUrl.startsWith('data:image') && needsCompression(imageUrl)) {
       try {
+        // 이미 압축된 이미지인지 확인 (크기가 작으면 이미 압축된 것으로 간주)
         finalImageUrl = await compressImage(imageUrl, 400, 400, 0.4)
       } catch (error) {
         console.warn('저장 전 이미지 재압축 실패, 원본 사용:', error)

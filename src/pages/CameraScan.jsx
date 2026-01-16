@@ -16,25 +16,16 @@ export default function CameraScan() {
   const webcamRef = useRef(null)
 
   const videoConstraints = {
-    width: { ideal: 1280 },
-    height: { ideal: 720 },
+    width: { ideal: 1920, min: 1280 }, // 고해상도로 향상 (분석 정확도 개선)
+    height: { ideal: 1080, min: 720 },
     facingMode: 'environment'
   }
 
   const capture = useCallback(async () => {
     if (webcamRef.current) {
+      // 원본 고화질 이미지 캡처 (분석 정확도를 위해 압축하지 않음)
       const originalImageSrc = webcamRef.current.getScreenshot()
-
-      try {
-        // 이미지 압축 (최대 400x400, 품질 40%) - 200장 저장을 위해 최적화
-        const compressedImageSrc = await compressImage(originalImageSrc, 400, 400, 0.4)
-        setCapturedImage(compressedImageSrc)
-      } catch (error) {
-        console.error('이미지 압축 실패, 원본 사용:', error)
-        // 압축 실패 시 원본 사용
-        setCapturedImage(originalImageSrc)
-      }
-
+      setCapturedImage(originalImageSrc)
       setIsScanning(false)
     }
   }, [webcamRef])
@@ -70,7 +61,16 @@ export default function CameraScan() {
       setAnalysisResult(null)
       setIsAnalyzing(true)
 
-      const response = await fetch(capturedImage)
+      // 분석용: 고화질 이미지 사용 (800x800, 품질 0.8) - 정확도 향상
+      let analysisImageSrc = capturedImage
+      try {
+        analysisImageSrc = await compressImage(capturedImage, 800, 800, 0.8)
+      } catch (error) {
+        console.warn('분석용 이미지 압축 실패, 원본 사용:', error)
+        // 압축 실패 시 원본 사용
+      }
+
+      const response = await fetch(analysisImageSrc)
       const blob = await response.blob()
 
       const result = await analyzeCard(blob)
@@ -81,7 +81,16 @@ export default function CameraScan() {
       }
 
       setAnalysisResult(result)
-      await saveCardToPokedex(capturedImage, result)
+      
+      // 저장용: 압축된 이미지 사용 (400x400, 품질 0.4) - 저장 공간 절약
+      let storageImageSrc = capturedImage
+      try {
+        storageImageSrc = await compressImage(capturedImage, 400, 400, 0.4)
+      } catch (error) {
+        console.warn('저장용 이미지 압축 실패, 원본 사용:', error)
+      }
+      
+      await saveCardToPokedex(storageImageSrc, result)
     } catch (err) {
       let errorMessage = err.message || '카드 분석 중 오류가 발생했습니다.'
 
