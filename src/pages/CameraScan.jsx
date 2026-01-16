@@ -26,8 +26,8 @@ export default function CameraScan() {
       const originalImageSrc = webcamRef.current.getScreenshot()
 
       try {
-        // 이미지 압축 (최대 800x800, 품질 70%)
-        const compressedImageSrc = await compressImage(originalImageSrc, 800, 800, 0.7)
+        // 이미지 압축 (최대 400x400, 품질 40%) - 200장 저장을 위해 최적화
+        const compressedImageSrc = await compressImage(originalImageSrc, 400, 400, 0.4)
         setCapturedImage(compressedImageSrc)
       } catch (error) {
         console.error('이미지 압축 실패, 원본 사용:', error)
@@ -81,7 +81,7 @@ export default function CameraScan() {
       }
 
       setAnalysisResult(result)
-      saveCardToPokedex(capturedImage, result)
+      await saveCardToPokedex(capturedImage, result)
     } catch (err) {
       let errorMessage = err.message || '카드 분석 중 오류가 발생했습니다.'
 

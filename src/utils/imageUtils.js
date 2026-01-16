@@ -5,12 +5,12 @@
 /**
  * 이미지를 압축하여 base64 문자열로 반환
  * @param {string} imageSrc - base64 이미지 문자열 (data:image/jpeg;base64,...)
- * @param {number} maxWidth - 최대 너비 (기본값: 800px)
- * @param {number} maxHeight - 최대 높이 (기본값: 800px)
- * @param {number} quality - JPEG 품질 (0.1 ~ 1.0, 기본값: 0.7)
+ * @param {number} maxWidth - 최대 너비 (기본값: 400px, 200장 저장 목표)
+ * @param {number} maxHeight - 최대 높이 (기본값: 400px, 200장 저장 목표)
+ * @param {number} quality - JPEG 품질 (0.1 ~ 1.0, 기본값: 0.4)
  * @returns {Promise<string>} 압축된 base64 이미지 문자열
  */
-export function compressImage(imageSrc, maxWidth = 600, maxHeight = 600, quality = 0.5) {
+export function compressImage(imageSrc, maxWidth = 400, maxHeight = 400, quality = 0.4) {
   return new Promise((resolve, reject) => {
     try {
       const img = new Image()

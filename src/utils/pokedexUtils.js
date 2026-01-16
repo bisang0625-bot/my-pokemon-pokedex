@@ -55,16 +55,26 @@ function convertTypeToEnglish(koreanType) {
  * @param {string} imageUrl - 카드 이미지 URL
  * @param {Object} analysisResult - 분석 결과 객체
  */
-export function saveCardToPokedex(imageUrl, analysisResult) {
+export async function saveCardToPokedex(imageUrl, analysisResult) {
   try {
     const savedCards = JSON.parse(localStorage.getItem('pokedexCards') || '[]')
 
     // 타입을 영어 코드로 변환
     const typeEnglish = convertTypeToEnglish(analysisResult.type);
 
+    // 저장 전 이미지 압축 강화 (200장 저장 목표)
+    let finalImageUrl = imageUrl
+    if (imageUrl && imageUrl.startsWith('data:image') && needsCompression(imageUrl)) {
+      try {
+        finalImageUrl = await compressImage(imageUrl, 400, 400, 0.4)
+      } catch (error) {
+        console.warn('저장 전 이미지 재압축 실패, 원본 사용:', error)
+      }
+    }
+
     const newCard = {
       id: Date.now().toString(),
-      image: imageUrl,
+      image: finalImageUrl,
       name: analysisResult.name || '알 수 없는 몬스터',
       type: typeEnglish, // 영어 코드로 저장
       typeKorean: analysisResult.type || '노말', // 한국어 타입도 별도로 저장 (표시용)
@@ -112,9 +122,9 @@ function needsCompression(imageSrc) {
   if (!imageSrc || typeof imageSrc !== 'string') return false
   if (!imageSrc.startsWith('data:image')) return false
 
-  // base64 문자열 길이가 80KB (약 100,000자) 이상이면 압축 필요
-  // 새 압축 기준: 600x600, 품질 0.5로 훨씬 작은 이미지 생성
-  return imageSrc.length > 100000
+  // base64 문자열 길이가 50KB (약 65,000자) 이상이면 압축 필요
+  // 새 압축 기준: 400x400, 품질 0.4로 매우 작은 이미지 생성 (200장 저장 목표)
+  return imageSrc.length > 65000
 }
 
 /**
@@ -140,7 +150,7 @@ export function getCardsFromPokedex() {
  * @returns {Promise<void>}
  */
 export async function runImageCompressionMigration() {
-  const migrationKey = 'imageCompressionMigrationV2Done' // v2: 더 강한 압축 적용
+  const migrationKey = 'imageCompressionMigrationV3Done' // v3: 400x400, 품질 0.4로 강화 (200장 저장 목표)
   const migrationDone = localStorage.getItem(migrationKey) === 'true'
 
   // 이미 마이그레이션이 완료되었으면 실행하지 않음
@@ -194,7 +204,8 @@ async function compressExistingImages(cards, migrationKey) {
 
     for (const card of cardsToCompress) {
       try {
-        const compressedImage = await compressImage(card.image, 600, 600, 0.5)
+        // 200장 저장 목표: 400x400, 품질 0.4로 더 강한 압축
+        const compressedImage = await compressImage(card.image, 400, 400, 0.4)
 
         // 카드 배열에서 해당 카드 찾아서 업데이트
         const cardIndex = updatedCards.findIndex(c => c.id === card.id)
