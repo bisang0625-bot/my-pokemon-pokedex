@@ -19,31 +19,45 @@ export async function analyzeCard(imageBlob) {
       throw new Error('API 키가 설정되지 않았습니다. 부모 모드에서 API 키를 설정해주세요.');
     }
 
-    // gemini-2.0-flash-exp 모델을 사용합니다. (현재 환경에서 작동 확인된 모델)
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+    // gemini-2.5-flash 모델 사용 - 검증 완료된 최신 안정 버전 (정확도 향상)
+    // gemini-1.5 버전은 작동하지 않았으므로 2.0/2.5 버전 사용
+    // gemini-2.5-flash는 최신 버전으로 정확도가 높음
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-2.5-flash",
+      generationConfig: {
+        temperature: 0.1, // 낮은 온도로 더 정확하고 일관된 응답
+        topP: 0.95,
+        topK: 40,
+      }
+    });
 
     const base64Data = await blobToBase64(imageBlob);
 
-    // 1단계: 포켓몬 카드인지 먼저 확인
-    const validationPrompt = `이미지를 확인하고 이것이 포켓몬 트레이딩 카드 게임(Pokemon TCG)의 공식 포켓몬 카드인지 판단해주세요.
+    // 1단계: 포켓몬 카드인지 먼저 확인 (더 상세한 검증)
+    const validationPrompt = `당신은 포켓몬 카드 전문 분석가입니다. 제공된 이미지를 매우 신중하게 검토하여 이것이 포켓몬 트레이딩 카드 게임(Pokemon TCG)의 공식 포켓몬 카드인지 정확히 판단해주세요.
 
-포켓몬 카드의 특징:
-- Pokemon Company 또는 Pokemon International의 로고나 브랜딩
-- 포켓몬 캐릭터 (피카추, 파이리, 꼬부기 등)
-- HP(체력) 숫자 표시
-- 타입 아이콘 (불꽃, 물, 풀, 전기 등)
-- 카드 게임의 특징적인 레이아웃과 디자인
+**포켓몬 카드의 명확한 특징:**
+1. 상단 또는 하단에 "Pokemon" 또는 "Pokemon Company" 로고/브랜딩
+2. 카드 왼쪽 상단 또는 중앙에 HP(체력) 숫자 표시 (예: "HP 60", "HP 120")
+3. 카드 오른쪽 상단에 타입 아이콘/심볼 (불꽃🔥, 물💧, 풀🌿, 전기⚡ 등)
+4. 카드 중앙에 포켓몬 캐릭터 일러스트 (피카추, 파이리, 꼬부기 등)
+5. 하단에 포켓몬 이름이 한국어 또는 영어로 명확히 표시
+6. 카드 게임 특유의 직사각형 레이아웃 (약 2.5:3.5 비율)
+7. 카드 테두리와 프레임 디자인
 
-포켓몬 카드가 아닌 경우:
+**포켓몬 카드가 아닌 경우:**
 - 일반 사진, 그림, 만화책 페이지
-- 다른 TCG 카드 (유희왕, 매직 더 게더링 등)
-- 포켓몬 관련 상품이나 장난감의 사진
+- 다른 TCG 카드 (유희왕, 매직 더 게더링, 베이블레이드 등)
+- 포켓몬 관련 상품, 장난감, 피규어 사진
 - 포켓몬이 그려진 일러스트나 팬아트
+- 포켓몬 영화/애니메이션 스크린샷
 
-아래 JSON 형식으로만 답해주세요 (반드시 유효한 JSON만 반환):
+**중요:** 이미지를 꼼꼼히 살펴보고 위 특징들을 모두 확인한 후 판단하세요.
+
+반드시 아래 JSON 형식으로만 답변하세요 (설명 없이 JSON만):
 {
   "isPokemonCard": true 또는 false,
-  "reason": "포켓몬 카드인 이유 또는 아닌 이유 (한국어로 간단히 설명)"
+  "reason": "포켓몬 카드인 이유 또는 아닌 이유를 한국어로 구체적으로 설명"
 }`;
 
     const imagePart = {
@@ -56,14 +70,28 @@ export async function analyzeCard(imageBlob) {
     // 1단계: 카드 검증
     const validationResult = await model.generateContent([validationPrompt, imagePart]);
     const validationResponse = validationResult.response;
-    const validationText = validationResponse.text();
+    let validationText = validationResponse.text();
+    
+    // JSON 추출 개선 - 마크다운 코드 블록이나 설명 제거
+    validationText = validationText.trim();
+    // 마크다운 코드 블록 제거
+    validationText = validationText.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+    // JSON 부분만 추출
     const validationJsonMatch = validationText.match(/\{[\s\S]*\}/);
 
     if (!validationJsonMatch) {
+      console.error('검증 응답 원문:', validationText);
       throw new Error("카드 검증 데이터를 찾을 수 없습니다.");
     }
 
-    const validation = JSON.parse(validationJsonMatch[0]);
+    let validation;
+    try {
+      validation = JSON.parse(validationJsonMatch[0]);
+    } catch (parseError) {
+      console.error('JSON 파싱 오류:', parseError);
+      console.error('파싱 시도한 텍스트:', validationJsonMatch[0]);
+      throw new Error("카드 검증 데이터를 읽을 수 없습니다. 카드를 다시 스캔해주세요.");
+    }
 
     // 포켓몬 카드가 아니면 에러 발생
     if (!validation.isPokemonCard) {
@@ -74,40 +102,109 @@ export async function analyzeCard(imageBlob) {
     // 비공식/위조 카드 여부 저장 (내부적으로만 사용, UI에는 표시 안 함)
     const isOfficial = validation.isOfficial !== false; // 기본값은 true
 
-    // 2단계: 포켓몬 카드 상세 분석
-    const analysisPrompt = `이 포켓몬 카드를 자세히 분석해서 아래 JSON 형식으로만 답해줘.
+    // 2단계: 포켓몬 카드 상세 분석 (정확도 향상을 위한 상세 프롬프트)
+    const analysisPrompt = `당신은 포켓몬 카드 전문 분석가입니다. 제공된 포켓몬 카드 이미지를 매우 정확하게 분석하여 아래 정보를 추출해주세요.
 
-중요 규칙:
-1. 모든 값(value)을 반드시 한국어로 작성하고, 영어를 절대 사용하지 마세요.
-    2. 타입은 다음 중 하나로 한국어로 답하세요: "노말", "불꽃", "물", "전기", "풀", "얼음", "격투", "독", "땅", "비행", "에스퍼", "벌레", "바위", "고스트", "드래곤", "악", "강철", "페어리"
-3. 강점/약점도 한국어 타입 이름으로 작성하세요 (예: "불꽃", "물" 등).
-4. 희귀도(rarity)는 카드의 희귀도를 1~5 사이 숫자로 판단하세요 (1=일반, 5=전설).
-5. HP는 카드에 표시된 체력 숫자를 정확히 읽어주세요.
-6. powerLevel은 카드의 강력함을 1~100 사이 숫자로 평가하세요 (HP, 희귀도, 기술 등을 종합적으로 고려).
+**분석 시 주의사항:**
+1. 카드의 모든 텍스트와 숫자를 정확히 읽어주세요
+2. 카드 이미지를 꼼꼼히 관찰하여 정보를 추출하세요
+3. 추측하지 말고 카드에 실제로 표시된 정보만 사용하세요
 
-반드시 유효한 JSON만 반환하세요 (설명이나 추가 텍스트 없이):
+**각 필드별 분석 가이드:**
+
+**1. name (포켓몬 이름)**
+- 카드 상단 또는 중앙에 표시된 포켓몬의 정확한 이름
+- 한국어로 표시된 경우 한국어 이름 사용
+- 영어로만 표시된 경우 한국어로 번역 (예: "Pikachu" → "피카추")
+- 반드시 한국어로만 작성, 영어 사용 금지
+
+**2. hp (체력)**
+- 카드 왼쪽 상단 또는 중앙에 표시된 "HP 60", "HP 120" 등의 숫자 값
+- 정확히 읽어서 숫자만 반환 (예: 60, 120, 200)
+- 추측하지 말고 실제 카드에 표시된 숫자만 사용
+
+**3. type (타입)**
+- 카드 오른쪽 상단의 타입 아이콘/심볼을 확인
+- 다음 중 정확히 하나를 선택 (반드시 한국어): "노말", "불꽃", "물", "전기", "풀", "얼음", "격투", "독", "땅", "비행", "에스퍼", "벌레", "바위", "고스트", "드래곤", "악", "강철", "페어리"
+- 타입 아이콘의 색상과 모양을 정확히 식별
+
+**4. rarity (희귀도)**
+- 카드 하단의 희귀도 표시 확인
+- 1 = 일반 카드 (별표 없음 또는 흰색 별)
+- 2 = 언커먼 카드 (1개 별)
+- 3 = 레어 카드 (2개 별)
+- 4 = 엘리트 레어/울트라 레어 (3개 별 또는 특별 표시)
+- 5 = 전설/시크릿 레어 (4개 별 이상 또는 특별 표시)
+- 카드의 실제 희귀도 표시를 확인하여 판단
+
+**5. description (설명)**
+- 카드에 표시된 포켓몬의 특성이나 능력 설명
+- 없으면 포켓몬 이름을 바탕으로 간단히 작성
+- 한국어로 50자 이내
+
+**6. powerLevel (강력함 수치)**
+- HP, 희귀도, 기술 등을 종합하여 1~100 사이 숫자로 평가
+- HP가 높을수록, 희귀도가 높을수록, 강력한 기술이 있을수록 높은 수치
+- 예: HP 60 + 희귀도 2 = 약 40-50, HP 200 + 희귀도 5 = 90-100
+
+**7. strongAgainst (강점 타입)**
+- 포켓몬 타입 상성표를 기준으로 강점 타입
+- 예: 불꽃 타입 → "풀" 또는 "벌레" 또는 "얼음"
+- 한국어 타입 이름으로 작성
+
+**8. weakAgainst (약점 타입)**
+- 포켓몬 타입 상성표를 기준으로 약점 타입
+- 예: 불꽃 타입 → "물" 또는 "땅" 또는 "바위"
+- 한국어 타입 이름으로 작성
+
+**9. nickname (별명)**
+- 포켓몬 이름을 바탕으로 귀여운 한국어 별명
+- 예: "피카추" → "번개공주", "파이리" → "불꽃악어"
+- 선택사항이지만 가능하면 작성
+
+**중요 규칙:**
+- 모든 텍스트를 반드시 한국어로만 작성 (영어 절대 사용 금지)
+- JSON 형식만 반환하고 설명이나 추가 텍스트는 포함하지 마세요
+- 카드에 표시된 정보만 사용하고 추측하지 마세요
+- 숫자는 정수로만 작성 (예: 60, 120)
+
+아래 JSON 형식으로만 답변하세요:
 { 
   "name": "포켓몬 이름 (한국어)", 
   "hp": 숫자, 
-  "type": "불꽃 또는 물 또는 풀 또는 전기 등 (한국어)", 
+  "type": "타입 (한국어)", 
   "rarity": 1~5 사이 숫자, 
-  "description": "카드에 대한 간단한 설명 (한국어, 50자 이내)", 
+  "description": "설명 (한국어, 50자 이내)", 
   "powerLevel": 1~100 사이 숫자, 
-  "strongAgainst": "강점 타입 (한국어 타입 이름)", 
-  "weakAgainst": "약점 타입 (한국어 타입 이름)", 
-  "nickname": "카드에 적합한 귀여운 별명 (한국어, 선택사항)" 
+  "strongAgainst": "강점 타입 (한국어)", 
+  "weakAgainst": "약점 타입 (한국어)", 
+  "nickname": "별명 (한국어)" 
 }`;
 
     const analysisResult = await model.generateContent([analysisPrompt, imagePart]);
     const analysisResponse = analysisResult.response;
-    const analysisText = analysisResponse.text();
+    let analysisText = analysisResponse.text();
+    
+    // JSON 추출 개선 - 마크다운 코드 블록이나 설명 제거
+    analysisText = analysisText.trim();
+    // 마크다운 코드 블록 제거
+    analysisText = analysisText.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+    // JSON 부분만 추출
     const analysisJsonMatch = analysisText.match(/\{[\s\S]*\}/);
 
     if (!analysisJsonMatch) {
-      throw new Error("분석 데이터를 찾을 수 없습니다.");
+      console.error('분석 응답 원문:', analysisText);
+      throw new Error("분석 데이터를 찾을 수 없습니다. 카드를 명확하게 스캔해주세요.");
     }
 
-    const result = JSON.parse(analysisJsonMatch[0]);
+    let result;
+    try {
+      result = JSON.parse(analysisJsonMatch[0]);
+    } catch (parseError) {
+      console.error('JSON 파싱 오류:', parseError);
+      console.error('파싱 시도한 텍스트:', analysisJsonMatch[0]);
+      throw new Error("카드 분석 데이터를 읽을 수 없습니다. 카드를 다시 스캔해주세요.");
+    }
 
     // 결과 검증
     if (!result.name || !result.hp || !result.type) {

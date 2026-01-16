@@ -23,7 +23,14 @@ export async function getRealCardPrice(card) {
       };
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+    // gemini-2.5-flash 사용 - 검증 완료된 작동하는 모델
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-2.5-flash",
+      generationConfig: {
+        temperature: 0.2,
+        topP: 0.95,
+      }
+    });
 
     const prompt = `포켓몬 카드 시세 정보를 제공해주세요. 
 카드 정보: 이름 ${card.name}, HP ${card.hp}, 타입 ${card.type}, 희귀도 ${card.rarity}성. 
